@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">শালিক</string>
+    <string name="app_tagline">ইন্টারনেট ছাড়াই মাঠের কৃষি সহকারী</string>
+    <string name="offline_mode_active">সম্পূর্ণ অফলাইন মোড সক্রিয়</string>
+    <string name="ask_problem_hint">ফসলের সমস্যা লিখুন বা প্রশ্ন করুন...</string>
+    <string name="take_leaf_photo">গাছের পাতার ছবি তুলুন</string>
+    <string name="hold_to_speak">চেপে ধরে বাংলায় কথা বলুন</string>
+    <string name="call_helpline">কৃষি কল সেন্টার: ১৬১২৩</string>
+    <string name="new_chat">নতুন পরামর্শ</string>
+</resources>

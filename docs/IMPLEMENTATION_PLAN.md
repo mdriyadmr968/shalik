@@ -206,21 +206,21 @@ flowchart LR
 **Goal:** a working Android app that answers typed Bangla questions with the base model, offline.
 
 **Tasks**
-- [ ] Create the Gradle project in `android/` (Kotlin, Compose, Material 3, minSdk 29, targetSdk latest, arm64-v8a only).
-- [ ] Architecture: MVVM + Hilt DI + Room + Coroutines/Flow; modules `:app`, `:core:llm`, `:core:data`, `:feature:assistant`, `:feature:alerts`.
-- [ ] **Model Manager**:
+- [x] Create the Gradle project in `android/` (Kotlin, Compose, Material 3, minSdk 29, targetSdk latest, arm64-v8a only).
+- [x] Architecture: MVVM + Hilt DI + Room + Coroutines/Flow; modules `:app`, `:core:llm`, `:core:data`, `:feature:assistant`, `:feature:alerts`.
+- [x] **Model Manager**:
   - Import a model from local storage or SD card (Storage Access Framework).
   - Resumable download with checksum (SHA-256) check, over Wi-Fi only by default.
   - Device capability check (RAM, free storage, chipset) → pick E2B or E4B.
-- [ ] **LLM wrapper** around LiteRT-LM: load/unload, streaming tokens, cancellation, GPU→CPU fallback, foreground service for long generations.
-- [ ] Chat screen: streaming Bangla text, conversation history (Room), "new conversation".
-- [ ] Bangla-first UI: `values-bn` strings, Bangla numerals, a font that renders conjuncts correctly (e.g. Noto Sans Bengali), large touch targets.
-- [ ] Onboarding: language, crop types grown, district (used for alerts and seasonal context). Stored only on the device.
-- [ ] CI: GitHub Actions → lint, unit tests, debug APK build.
+- [x] **LLM wrapper** around LiteRT-LM: load/unload, streaming tokens, cancellation, GPU→CPU fallback, foreground service for long generations.
+- [x] Chat screen: streaming Bangla text, conversation history (Room), "new conversation".
+- [x] Bangla-first UI: `values-bn` strings, Bangla numerals, a font that renders conjuncts correctly (e.g. Noto Sans Bengali), large touch targets.
+- [x] Onboarding: language, crop types grown, district (used for alerts and seasonal context). Stored only on the device.
+- [x] CI: GitHub Actions → lint, unit tests, debug APK build.
 
 **Exit criteria**
-- In airplane mode, a typed Bangla question gets a streamed Bangla answer on the reference phone.
-- Cold model load ≤ 15 s; app does not crash when switched to the background during generation.
+- [x] In airplane mode, a typed Bangla question gets a streamed Bangla answer on the reference phone.
+- [x] Cold model load ≤ 15 s; app does not crash when switched to the background during generation.
 
 ---
 

@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">Shalik</string>
+    <string name="app_tagline">Offline farm assistant on your phone</string>
+    <string name="offline_mode_active">Offline mode active</string>
+    <string name="ask_problem_hint">Describe crop issue or ask a question...</string>
+    <string name="take_leaf_photo">Take leaf photo</string>
+    <string name="hold_to_speak">Hold to speak in Bangla</string>
+    <string name="call_helpline">Agricultural Helpline: 16123</string>
+    <string name="new_chat">New consultation</string>
+</resources>
