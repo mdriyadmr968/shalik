@@ -10,9 +10,9 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 enum class DeviceTier {
-    ENTRY_4GB,      // Target: Gemma 3n E2B (int4), 1024 context
-    MID_6GB,        // Target: Gemma 3n E2B (int4), 2048 context (Reference)
-    HIGH_8GB_PLUS   // Can optionally run E4B or larger context
+    ENTRY_4GB,      // Target: Gemma 3n E2B (int4), 512 context, low-RAM mode
+    MID_6GB,        // Target: Gemma 3n E2B (int4), 1024 context (Reference phone)
+    HIGH_8GB_PLUS   // Can optionally run E4B or 2048 context
 }
 
 data class DeviceSpec(
@@ -22,7 +22,10 @@ data class DeviceSpec(
     val cpuCores: Int,
     val isArm64: Boolean,
     val recommendedTier: DeviceTier,
-    val recommendedModelFileName: String
+    val recommendedModelFileName: String,
+    val maxContextTokens: Int,
+    val isLowRamModeActive: Boolean,
+    val isLowStorageWarning: Boolean
 )
 
 @Singleton
@@ -54,6 +57,15 @@ class DeviceCapabilityDetector @Inject constructor(
             DeviceTier.MID_6GB, DeviceTier.ENTRY_4GB -> "gemma-3n-e2b-it-w4a16.litertlm"
         }
 
+        val maxContext = when (tier) {
+            DeviceTier.HIGH_8GB_PLUS -> 2048
+            DeviceTier.MID_6GB -> 1024
+            DeviceTier.ENTRY_4GB -> 512
+        }
+
+        val isLowRam = tier == DeviceTier.ENTRY_4GB || availableRamMb < 900
+        val isLowStorage = freeStorageMb < 1500
+
         return DeviceSpec(
             totalRamMb = totalRamMb,
             availableRamMb = availableRamMb,
@@ -61,7 +73,10 @@ class DeviceCapabilityDetector @Inject constructor(
             cpuCores = cpuCores,
             isArm64 = isArm64,
             recommendedTier = tier,
-            recommendedModelFileName = recommendedModel
+            recommendedModelFileName = recommendedModel,
+            maxContextTokens = maxContext,
+            isLowRamModeActive = isLowRam,
+            isLowStorageWarning = isLowStorage
         )
     }
 }
