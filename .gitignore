@@ -1,0 +1,47 @@
+# --- Android / Gradle ---
+.gradle/
+build/
+local.properties
+*.iml
+.idea/
+captures/
+.externalNativeBuild/
+.cxx/
+*.apk
+*.aab
+*.keystore
+*.jks
+
+# --- Python ---
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.ipynb_checkpoints/
+.env
+
+# --- ML artifacts (large; store in HF Hub / DVC / release assets) ---
+*.litertlm
+*.task
+*.tflite
+*.gguf
+*.safetensors
+*.bin
+*.pt
+*.ckpt
+ml/**/outputs/
+ml/**/checkpoints/
+wandb/
+mlruns/
+
+# --- Data (never commit raw data) ---
+data/raw/
+data/processed/
+data/interim/
+!data/README.md
+knowledge/build/
+*.sqlite
+
+# --- OS ---
+.DS_Store
+Thumbs.db

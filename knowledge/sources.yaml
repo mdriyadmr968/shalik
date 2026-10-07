@@ -1,0 +1,54 @@
+# Source manifest for the knowledge base and training data.
+# Every document or dataset must be listed here BEFORE it is used.
+# permission: pending | granted | public-domain | open-licence | rejected
+
+sources:
+  - id: dae-crop-guides
+    publisher: Department of Agricultural Extension (DAE)
+    title: Crop production and pest management guides
+    url: https://dae.gov.bd
+    language: bn
+    crops: [rice, vegetables, jute, pulses, oilseeds]
+    use: [kb, sft]
+    licence: unknown
+    permission: pending
+
+  - id: brri-rkb
+    publisher: Bangladesh Rice Research Institute (BRRI)
+    title: Rice Knowledge Bank
+    url: https://brri.gov.bd
+    language: bn
+    crops: [rice]
+    use: [kb, sft]
+    licence: unknown
+    permission: pending
+
+  - id: bari-hatboi
+    publisher: Bangladesh Agricultural Research Institute (BARI)
+    title: Krishi Projukti Hatboi (Agricultural Technology Handbook)
+    url: https://bari.gov.bd
+    language: bn
+    crops: [vegetables, pulses, oilseeds, fruits, wheat, maize]
+    use: [kb, sft]
+    licence: unknown
+    permission: pending
+
+  - id: barc-frg
+    publisher: Bangladesh Agricultural Research Council (BARC)
+    title: Fertilizer Recommendation Guide
+    url: https://barc.gov.bd
+    language: [bn, en]
+    crops: [all]
+    use: [kb]
+    licence: unknown
+    permission: pending
+
+  - id: riceleafdiseasebd
+    publisher: Mendeley Data (academic)
+    title: RiceLeafDiseaseBD
+    url: https://data.mendeley.com
+    language: n/a
+    crops: [rice]
+    use: [classifier, vision-sft, eval]
+    licence: check-dataset-page
+    permission: pending

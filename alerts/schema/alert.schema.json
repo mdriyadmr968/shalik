@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://shalik.app/schemas/alert.schema.json",
+  "title": "Shalik Alert",
+  "description": "Contract between the Idea #3 heat/flood alert service and the Shalik app (Milestone M6). Loosely based on the Common Alerting Protocol (CAP).",
+  "type": "object",
+  "required": ["id", "type", "severity", "area", "valid_from", "valid_to", "message_bn", "source", "signature"],
+  "properties": {
+    "id": { "type": "string", "description": "Globally unique alert ID" },
+    "type": { "type": "string", "enum": ["heat", "flood", "cyclone", "heavy_rain", "cold"] },
+    "severity": { "type": "integer", "minimum": 1, "maximum": 4, "description": "1=advisory, 2=watch, 3=warning, 4=emergency" },
+    "area": {
+      "type": "object",
+      "required": ["district_codes"],
+      "properties": {
+        "district_codes": { "type": "array", "items": { "type": "string" }, "minItems": 1 },
+        "upazila_codes": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "valid_from": { "type": "string", "format": "date-time" },
+    "valid_to": { "type": "string", "format": "date-time" },
+    "message_bn": { "type": "string", "description": "Short Bangla message shown and spoken to the user" },
+    "message_en": { "type": "string" },
+    "source": { "type": "string", "description": "Upstream source, e.g. FFWC, BMD" },
+    "action_template_ids": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Agronomist-approved action templates (by crop/stage) to show alongside the alert"
+    },
+    "signature": { "type": "string", "description": "Ed25519 signature (base64) over the canonical JSON without this field" }
+  },
+  "additionalProperties": false
+}
