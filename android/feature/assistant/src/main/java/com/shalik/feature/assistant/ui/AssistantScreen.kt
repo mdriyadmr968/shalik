@@ -10,9 +10,11 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.CameraAlt
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Mic
 import androidx.compose.material.icons.filled.Send
 import androidx.compose.material.icons.filled.Stop
+import androidx.compose.material.icons.filled.VolumeUp
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -23,10 +25,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.shalik.core.data.model.ChatMessage
 import com.shalik.core.data.model.MessageSender
+import com.shalik.feature.assistant.speech.RecordingState
+import com.shalik.feature.assistant.util.BanglaFormatters
 import com.shalik.feature.assistant.viewmodel.AssistantUiState
 
 val AgriculturalGreen = Color(0xFF1B5E20)
-val AgriculturalLightGreen = Color(0xFFE8F5E9)
 val SoilBrown = Color(0xFF5D4037)
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -36,6 +39,11 @@ fun AssistantScreen(
     onSendQuery: (String) -> Unit,
     onCancelGeneration: () -> Unit,
     onNewConversation: () -> Unit,
+    onPlayAudio: (String) -> Unit = {},
+    onStartVoiceRecording: () -> Unit = {},
+    onStopVoiceRecording: () -> Unit = {},
+    onConfirmVoiceTranscript: (String) -> Unit = {},
+    onDismissVoiceTranscript: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     var textInput by remember { mutableStateOf("") }
@@ -61,7 +69,7 @@ fun AssistantScreen(
                             color = Color.White
                         )
                         Text(
-                            text = "ইন্টারনেট ছাড়াই মাঠের কৃষি সহকারী",
+                            text = "ইন্টারনেট ছাড়াই কণ্ঠ ও চোখের কৃষি সহকারী",
                             fontSize = 12.sp,
                             color = Color(0xFFC8E6C9)
                         )
@@ -76,9 +84,7 @@ fun AssistantScreen(
                         )
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = AgriculturalGreen
-                )
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = AgriculturalGreen)
             )
         },
         modifier = modifier
@@ -87,9 +93,9 @@ fun AssistantScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
-                .background(Color(0xFFF9FBE7)) // Warm sunlight-readable background
+                .background(Color(0xFFF9FBE7))
         ) {
-            // Offline Status & Safety Banner
+            // Status Banner
             Surface(
                 color = Color(0xFFDCEDC8),
                 modifier = Modifier.fillMaxWidth()
@@ -114,7 +120,34 @@ fun AssistantScreen(
                 }
             }
 
-            // Quick Agricultural Suggestions (when chat is empty)
+            // Attached Image Notice
+            if (uiState.attachedImageUri != null) {
+                Surface(
+                    color = Color(0xFFFFF9C4),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Row(
+                        modifier = Modifier.padding(8.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Text(
+                            text = "📷 পাতার ছবি সংযুক্ত করা হয়েছে",
+                            fontSize = 12.sp,
+                            color = SoilBrown
+                        )
+                        if (uiState.imageQualityWarning != null) {
+                            Text(
+                                text = "⚠️ ${uiState.imageQualityWarning}",
+                                fontSize = 11.sp,
+                                color = MaterialTheme.colorScheme.error
+                            )
+                        }
+                    }
+                }
+            }
+
+            // Empty Suggestions View
             if (uiState.messages.isEmpty() && uiState.streamingText.isEmpty()) {
                 QuickSuggestionsView(onSelectSuggestion = { suggestion ->
                     onSendQuery(suggestion)
@@ -131,10 +164,12 @@ fun AssistantScreen(
                 verticalArrangement = Arrangement.spacedBy(10.dp)
             ) {
                 items(uiState.messages, key = { it.id }) { message ->
-                    MessageBubble(message = message)
+                    MessageBubble(
+                        message = message,
+                        onPlayAudio = { onPlayAudio(message.text) }
+                    )
                 }
 
-                // Temporary Streaming Bubble
                 if (uiState.streamingText.isNotEmpty()) {
                     item {
                         StreamingMessageBubble(text = uiState.streamingText)
@@ -142,7 +177,28 @@ fun AssistantScreen(
                 }
             }
 
-            // Error display if any
+            // Voice Recording In-Progress Banner
+            if (uiState.recordingState is RecordingState.Recording) {
+                Surface(
+                    color = Color(0xFFFFEBEE),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Row(
+                        modifier = Modifier.padding(12.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Center
+                    ) {
+                        Text(
+                            text = "🔴 কথা শুনছি... ${BanglaFormatters.toBanglaDigits(uiState.recordingState.durationMs / 1000)} সেকেন্ড",
+                            fontWeight = FontWeight.Bold,
+                            color = Color(0xFFC62828),
+                            fontSize = 14.sp
+                        )
+                    }
+                }
+            }
+
+            // Error display
             if (uiState.error != null) {
                 Surface(
                     color = MaterialTheme.colorScheme.errorContainer,
@@ -169,9 +225,8 @@ fun AssistantScreen(
                         .padding(horizontal = 8.dp, vertical = 6.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    // Camera Action
                     IconButton(
-                        onClick = { /* M2 integration */ },
+                        onClick = { /* Camera capture action */ },
                         modifier = Modifier.size(44.dp)
                     ) {
                         Icon(
@@ -181,19 +236,29 @@ fun AssistantScreen(
                         )
                     }
 
-                    // Voice Input Action
+                    // Voice Input Button (Hold to speak)
                     IconButton(
-                        onClick = { /* M2 voice integration */ },
-                        modifier = Modifier.size(44.dp)
+                        onClick = {
+                            if (uiState.recordingState is RecordingState.Recording) {
+                                onStopVoiceRecording()
+                            } else {
+                                onStartVoiceRecording()
+                            }
+                        },
+                        modifier = Modifier
+                            .size(44.dp)
+                            .background(
+                                if (uiState.recordingState is RecordingState.Recording) Color(0xFFFFCDD2) else Color.Transparent,
+                                CircleShape
+                            )
                     ) {
                         Icon(
                             imageVector = Icons.Default.Mic,
                             contentDescription = "মুখে বলে প্রশ্ন করুন",
-                            tint = AgriculturalGreen
+                            tint = if (uiState.recordingState is RecordingState.Recording) Color.Red else AgriculturalGreen
                         )
                     }
 
-                    // Text Input
                     OutlinedTextField(
                         value = textInput,
                         onValueChange = { textInput = it },
@@ -205,7 +270,6 @@ fun AssistantScreen(
                         shape = RoundedCornerShape(24.dp)
                     )
 
-                    // Send / Stop button
                     if (uiState.isGenerating) {
                         IconButton(
                             onClick = onCancelGeneration,
@@ -246,10 +310,50 @@ fun AssistantScreen(
             }
         }
     }
+
+    // Voice Transcript Confirmation Dialog (M2)
+    if (uiState.pendingVoiceTranscript != null) {
+        var editedText by remember { mutableStateOf(uiState.pendingVoiceTranscript) }
+        AlertDialog(
+            onDismissRequest = onDismissVoiceTranscript,
+            title = { Text("আপনার মুখের কথা শোনা হয়েছে:", fontSize = 16.sp, fontWeight = FontWeight.Bold) },
+            text = {
+                Column {
+                    OutlinedTextField(
+                        value = editedText,
+                        onValueChange = { editedText = it },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                    Text(
+                        text = "দরকার হলে লেখাটি পরিবর্তন করে নিশ্চিত করুন।",
+                        fontSize = 12.sp,
+                        color = Color.Gray,
+                        modifier = Modifier.padding(top = 4.dp)
+                    )
+                }
+            },
+            confirmButton = {
+                Button(
+                    onClick = { onConfirmVoiceTranscript(editedText) },
+                    colors = ButtonDefaults.buttonColors(containerColor = AgriculturalGreen)
+                ) {
+                    Text("নিশ্চিত ও প্রেরণ")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = onDismissVoiceTranscript) {
+                    Text("বাতিল")
+                }
+            }
+        )
+    }
 }
 
 @Composable
-fun MessageBubble(message: ChatMessage) {
+fun MessageBubble(
+    message: ChatMessage,
+    onPlayAudio: () -> Unit
+) {
     val isUser = message.sender == MessageSender.USER
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -268,13 +372,30 @@ fun MessageBubble(message: ChatMessage) {
         ) {
             Column(modifier = Modifier.padding(12.dp)) {
                 if (!isUser) {
-                    Text(
-                        text = "শালিকের পরামর্শ",
-                        fontSize = 11.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = SoilBrown,
-                        modifier = Modifier.padding(bottom = 4.dp)
-                    )
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = "শালিকের পরামর্শ",
+                            fontSize = 11.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = SoilBrown
+                        )
+                        // TTS Audio Playback Button
+                        IconButton(
+                            onClick = onPlayAudio,
+                            modifier = Modifier.size(24.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.VolumeUp,
+                                contentDescription = "পরামর্শ শুনুন",
+                                tint = AgriculturalGreen,
+                                modifier = Modifier.size(18.dp)
+                            )
+                        }
+                    }
                 }
                 Text(
                     text = message.text,

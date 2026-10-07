@@ -13,6 +13,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.shalik.feature.assistant.ui.AssistantScreen
 import com.shalik.feature.assistant.viewmodel.AssistantViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import java.io.File
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -26,12 +27,18 @@ class MainActivity : ComponentActivity() {
                 ) {
                     val viewModel: AssistantViewModel = hiltViewModel()
                     val uiState by viewModel.uiState.collectAsState()
+                    val tempVoiceFile = File(cacheDir, "current_farmer_voice.wav")
 
                     AssistantScreen(
                         uiState = uiState,
-                        onSendQuery = { query -> viewModel.sendTextQuery(query) },
+                        onSendQuery = { query -> viewModel.sendQuery(query) },
                         onCancelGeneration = { viewModel.cancelGeneration() },
-                        onNewConversation = { viewModel.startNewConversation() }
+                        onNewConversation = { viewModel.startNewConversation() },
+                        onPlayAudio = { text -> viewModel.playMessageAudio(text) },
+                        onStartVoiceRecording = { viewModel.startVoiceRecording(tempVoiceFile) },
+                        onStopVoiceRecording = { viewModel.stopVoiceRecordingAndTranscribe(tempVoiceFile) },
+                        onConfirmVoiceTranscript = { text -> viewModel.confirmVoiceTranscript(text) },
+                        onDismissVoiceTranscript = { viewModel.dismissVoiceTranscript() }
                     )
                 }
             }

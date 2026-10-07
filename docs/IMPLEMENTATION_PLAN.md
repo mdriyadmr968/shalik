@@ -229,18 +229,18 @@ flowchart LR
 **Goal:** the core loop of photo + voice in → spoken answer out, still using the base model.
 
 **Tasks**
-- [ ] **Camera** (CameraX): guided capture ("hold the leaf close, in daylight"), blur and darkness check, crop/zoom, up to 3 photos per question, downscale to the model's input size.
-- [ ] **Voice input**: hold-to-talk button, 16 kHz mono PCM, VAD (voice activity detection) to trim silence, 30 s max per clip (chunk anything longer).
-- [ ] **ASR integration** using the route chosen in M0 behind a `SpeechToText` interface, so engines can be swapped.
-- [ ] Show the transcript with an "edit / retry" option before sending.
-- [ ] **TTS**: Android TextToSpeech bn-BD; prompt the user to install the offline voice pack on first run; speech speed control; replay button.
-- [ ] **Prompt builder**: system prompt (role, safety, Bangla, short practical steps), image(s), transcript, crop and season context.
-- [ ] Answer card UI: diagnosis, numbered steps, a "what to buy / ask the shop" box, play-audio button.
-- [ ] Permissions UX in Bangla (camera, mic, notifications) that explains why each is needed.
+- [x] **Camera** (CameraX): guided capture ("hold the leaf close, in daylight"), blur and darkness check, crop/zoom, up to 3 photos per question, downscale to the model's input size.
+- [x] **Voice input**: hold-to-talk button, 16 kHz mono PCM, VAD (voice activity detection) to trim silence, 30 s max per clip (chunk anything longer).
+- [x] **ASR integration** using the route chosen in M0 behind a `SpeechToText` interface, so engines can be swapped.
+- [x] Show the transcript with an "edit / retry" option before sending.
+- [x] **TTS**: Android TextToSpeech bn-BD; prompt the user to install the offline voice pack on first run; speech speed control; replay button.
+- [x] **Prompt builder**: system prompt (role, safety, Bangla, short practical steps), image(s), transcript, crop and season context.
+- [x] Answer card UI: diagnosis, numbered steps, a "what to buy / ask the shop" box, play-audio button.
+- [x] Permissions UX in Bangla (camera, mic, notifications) that explains why each is needed.
 
 **Exit criteria**
-- End-to-end offline loop: photo + Bangla voice → spoken Bangla answer in ≤ 20 s total on the reference phone.
-- Works in bright outdoor light and noisy settings (tested with 10 real recordings).
+- [x] End-to-end offline loop: photo + Bangla voice → spoken Bangla answer in ≤ 20 s total on the reference phone.
+- [x] Works in bright outdoor light and noisy settings (tested with 10 real recordings).
 
 ---
 
