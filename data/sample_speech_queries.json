@@ -1,0 +1,275 @@
+{
+  "description": "30 benchmark audio query transcripts for Spike A (Bangla Speech-to-Text feasibility). Covers agricultural terminology, Bangladeshi regional dialects, and field conditions.",
+  "samples": [
+    {
+      "id": "sq_001",
+      "dialect": "standard_colloquial",
+      "noise_condition": "wind_noise",
+      "crop": "rice",
+      "transcript": "ধানের পাতায় বাদামী রঙের দাগ দেখা যাচ্ছে, কি বিষ দিব?",
+      "translation": "Brown spots are visible on rice leaves, which pesticide should I apply?",
+      "difficulty": "easy"
+    },
+    {
+      "id": "sq_002",
+      "dialect": "rangpur_rajshahi",
+      "noise_condition": "diesel_pump_background",
+      "crop": "rice",
+      "transcript": "হামার ধানের পাতা শুক্যা যায়ছে, গোড়ায় পচন ধরছে ক্যান?",
+      "translation": "Our rice leaves are drying up, why is there rot at the base?",
+      "difficulty": "medium"
+    },
+    {
+      "id": "sq_003",
+      "dialect": "standard_colloquial",
+      "noise_condition": "quiet_field",
+      "crop": "potato",
+      "transcript": "আলু গাছের পাতা কুকড়ে গেছে আর নিচে পোকা আছে। কি স্প্রে করব?",
+      "translation": "Potato leaves are curled and there are insects underneath. What should I spray?",
+      "difficulty": "easy"
+    },
+    {
+      "id": "sq_004",
+      "dialect": "barisal",
+      "noise_condition": "wind_noise",
+      "crop": "rice",
+      "transcript": "ধানের শিষ সাদা অইয়া যাইতাছে, ভিতরে কিচ্ছু নাই।",
+      "translation": "Rice panicles are turning white, there is nothing inside.",
+      "difficulty": "hard"
+    },
+    {
+      "id": "sq_005",
+      "dialect": "standard_colloquial",
+      "noise_condition": "tractor_noise",
+      "crop": "jute",
+      "transcript": "পাটের পাতায় হলুদ দাগ আর শুঁয়োপোকার আক্রমণ হইছে।",
+      "translation": "Yellow spots on jute leaves and caterpillar infestation.",
+      "difficulty": "medium"
+    },
+    {
+      "id": "sq_006",
+      "dialect": "chittagong",
+      "noise_condition": "quiet_field",
+      "crop": "rice",
+      "transcript": "ধানের গড়ায় পোকা হাইয়েরে পাতা লাল অই গিয়ে।",
+      "translation": "Insects at the base of the rice plant are eating it and leaves turned red.",
+      "difficulty": "hard"
+    },
+    {
+      "id": "sq_007",
+      "dialect": "sylhet",
+      "noise_condition": "rain_drizzle",
+      "crop": "rice",
+      "transcript": "আমরার ধানো ব্লাস্ট রোগ দেখা দিসে, অখন কিতা করতাম?",
+      "translation": "Blast disease has appeared in our rice, what to do now?",
+      "difficulty": "hard"
+    },
+    {
+      "id": "sq_008",
+      "dialect": "standard_colloquial",
+      "noise_condition": "quiet_field",
+      "crop": "eggplant",
+      "transcript": "বেগুনের ডগা আর ফল ছিদ্রকারী পোকা দমনে কোন কীটনাশক ভালো?",
+      "translation": "Which insecticide is effective for brinjal shoot and fruit borer?",
+      "difficulty": "easy"
+    },
+    {
+      "id": "sq_009",
+      "dialect": "standard_colloquial",
+      "noise_condition": "market_chatter",
+      "crop": "rice",
+      "transcript": "বিঘা প্রতি ইউরিয়া আর পটাশ সার কি পরিমাণে ছিটাব?",
+      "translation": "How much urea and potash fertilizer should I apply per bigha?",
+      "difficulty": "easy"
+    },
+    {
+      "id": "sq_010",
+      "dialect": "rangpur",
+      "noise_condition": "quiet_field",
+      "crop": "maize",
+      "transcript": "ভুট্টার পাতাত লম্বা লম্বা সাদা দাগ পড়ছে, পোকাও আছে।",
+      "translation": "Long white streaks on maize leaves, insects are present too.",
+      "difficulty": "medium"
+    },
+    {
+      "id": "sq_011",
+      "dialect": "standard_colloquial",
+      "noise_condition": "wind_noise",
+      "crop": "tomato",
+      "transcript": "টমেটো পচে নিচে পড়ে যাচ্ছে, কোনো ওষুধে কাজ হবে?",
+      "translation": "Tomatoes are rotting and falling down, will any medicine work?",
+      "difficulty": "medium"
+    },
+    {
+      "id": "sq_012",
+      "dialect": "standard_colloquial",
+      "noise_condition": "quiet_field",
+      "crop": "rice",
+      "transcript": "টুংরো রোগ হলে ধানের চারা কি আর বাঁচানো সম্ভব?",
+      "translation": "If Tungro disease strikes, is it possible to save the rice seedlings?",
+      "difficulty": "medium"
+    },
+    {
+      "id": "sq_013",
+      "dialect": "kushtia_jashore",
+      "noise_condition": "quiet_field",
+      "crop": "rice",
+      "transcript": "ধানের শিষে দুধ আসার সময় গান্ধি পোকার উৎপাত কমাব কেমনে?",
+      "translation": "How to reduce rice bug infestation during the milk stage of the grain?",
+      "difficulty": "medium"
+    },
+    {
+      "id": "sq_014",
+      "dialect": "standard_colloquial",
+      "noise_condition": "diesel_pump_background",
+      "crop": "chili",
+      "transcript": "মরিচ গাছের পাতা নিচের দিকে মুড়িয়ে যাচ্ছে, কি করব?",
+      "translation": "Chili leaves are curling downwards, what should I do?",
+      "difficulty": "easy"
+    },
+    {
+      "id": "sq_015",
+      "dialect": "standard_colloquial",
+      "noise_condition": "wind_noise",
+      "crop": "rice",
+      "transcript": "বোরো ধানে শীথ ব্লাইট রোগের লক্ষণ কি এবং প্রতিকার কি?",
+      "translation": "What are the symptoms and remedies for sheath blight in Boro rice?",
+      "difficulty": "medium"
+    },
+    {
+      "id": "sq_016",
+      "dialect": "chittagong",
+      "noise_condition": "wind_noise",
+      "crop": "mustard",
+      "transcript": "সরিষাত জাব পোকা বেশি অইয়ে, বিষ ছিটাতাম নাকি?",
+      "translation": "Aphid infestation is heavy in mustard, should I spray pesticide?",
+      "difficulty": "hard"
+    },
+    {
+      "id": "sq_017",
+      "dialect": "standard_colloquial",
+      "noise_condition": "quiet_field",
+      "crop": "rice",
+      "transcript": "আমনের জমিতে মাজরা পোকার ডিম নষ্ট করার উপায় কি?",
+      "translation": "What is the way to destroy stem borer eggs in Aman paddy fields?",
+      "difficulty": "easy"
+    },
+    {
+      "id": "sq_018",
+      "dialect": "barisal",
+      "noise_condition": "quiet_field",
+      "crop": "betel_leaf",
+      "transcript": "পানের বরজে পাতা পচা রোগ ঠেকাইতে কি দেওয়া যায়?",
+      "translation": "What can be applied to prevent leaf rot in betel leaf sheds?",
+      "difficulty": "medium"
+    },
+    {
+      "id": "sq_019",
+      "dialect": "standard_colloquial",
+      "noise_condition": "wind_noise",
+      "crop": "rice",
+      "transcript": "বৃষ্টির পরে জমিতে পানি জমে ধানের পাতা পচে যাচ্ছে।",
+      "translation": "Waterlogged field after rain is causing rice leaves to rot.",
+      "difficulty": "easy"
+    },
+    {
+      "id": "sq_020",
+      "dialect": "rajshahi",
+      "noise_condition": "quiet_field",
+      "crop": "mango",
+      "transcript": "আম গাছে গুটি আসার সময় হপার পোকা তাড়াতে কি স্প্রে করব?",
+      "translation": "What spray should I use to repel mango hoppers during fruit setting?",
+      "difficulty": "medium"
+    },
+    {
+      "id": "sq_021",
+      "dialect": "standard_colloquial",
+      "noise_condition": "tractor_noise",
+      "crop": "wheat",
+      "transcript": "গমের পাতায় মরিচা রোগের দাগ পড়লে কোন ছত্রাকনাশক লাগে?",
+      "translation": "Which fungicide is needed when rust spots appear on wheat leaves?",
+      "difficulty": "medium"
+    },
+    {
+      "id": "sq_022",
+      "dialect": "standard_colloquial",
+      "noise_condition": "quiet_field",
+      "crop": "onion",
+      "transcript": "পেঁয়াজের পাতায় পার্পল ব্লচ রোগের ঘরোয়া সমাধান আছে কি?",
+      "translation": "Is there a domestic remedy for purple blotch on onion leaves?",
+      "difficulty": "medium"
+    },
+    {
+      "id": "sq_023",
+      "dialect": "sylhet",
+      "noise_condition": "wind_noise",
+      "crop": "rice",
+      "transcript": "হাওরের ধানে বানের পানি ঢুকার আগে ধান কাইট্টা লামাইতাম নি?",
+      "translation": "Should I harvest and bring in the haor rice before floodwaters enter?",
+      "difficulty": "hard"
+    },
+    {
+      "id": "sq_024",
+      "dialect": "standard_colloquial",
+      "noise_condition": "quiet_field",
+      "crop": "rice",
+      "transcript": "জমিতে দস্তা সারের ঘাটতি বুঝব কিভাবে?",
+      "translation": "How do I recognize zinc fertilizer deficiency in the soil?",
+      "difficulty": "easy"
+    },
+    {
+      "id": "sq_025",
+      "dialect": "standard_colloquial",
+      "noise_condition": "diesel_pump_background",
+      "crop": "cabbage",
+      "transcript": "বাঁধাকপিতে মাথা পচা রোগ দূর করার ওষুধ কি?",
+      "translation": "What is the medicine to cure head rot in cabbage?",
+      "difficulty": "easy"
+    },
+    {
+      "id": "sq_026",
+      "dialect": "rangpur",
+      "noise_condition": "quiet_field",
+      "crop": "tobacco",
+      "transcript": "তামাক পাতায় কালো দাগ পড়ছে, পাতা শুকায় ঝরে পড়ে।",
+      "translation": "Black spots on tobacco leaves, leaves dry up and drop.",
+      "difficulty": "medium"
+    },
+    {
+      "id": "sq_027",
+      "dialect": "standard_colloquial",
+      "noise_condition": "wind_noise",
+      "crop": "rice",
+      "transcript": "কারেন্ট পোকা বা বাদামী গাছফড়িং আক্রমণ করলে দ্রুত কি করতে হবে?",
+      "translation": "What should be done immediately if brown planthopper attacks?",
+      "difficulty": "medium"
+    },
+    {
+      "id": "sq_028",
+      "dialect": "standard_colloquial",
+      "noise_condition": "quiet_field",
+      "crop": "lentil",
+      "transcript": "মসুর ডালের চারা ঢলে পড়া রোগে মরে যাচ্ছে।",
+      "translation": "Lentil seedlings are dying due to collar rot and damping off.",
+      "difficulty": "easy"
+    },
+    {
+      "id": "sq_029",
+      "dialect": "chittagong",
+      "noise_condition": "rain_drizzle",
+      "crop": "watermelon",
+      "transcript": "তরমুজের ডগা পচি যাইয়েরে ফুল জড়ি পড়ে।",
+      "translation": "Watermelon vine tips are rotting and flowers are dropping.",
+      "difficulty": "hard"
+    },
+    {
+      "id": "sq_030",
+      "dialect": "standard_colloquial",
+      "noise_condition": "quiet_field",
+      "crop": "rice",
+      "transcript": "বন্যা পরবর্তী জমিতে নতুন করে রোপা আমন লাগানোর শেষ সময় কবে?",
+      "translation": "When is the last date to plant transplanted Aman rice in post-flood fields?",
+      "difficulty": "easy"
+    }
+  ]
+}

@@ -179,25 +179,25 @@ flowchart LR
 **Goal:** remove the biggest technical unknowns before writing product code.
 
 **Tasks**
-- [ ] Install Android Studio (latest stable), JDK 17+, Android SDK/NDK, Python 3.11 venv, Git LFS.
-- [ ] Get 2–3 test phones: **reference** (6 GB RAM, e.g. a mid-range Samsung A-series or Redmi Note), **low-end** (4 GB), **high-end** (8 GB+).
-- [ ] Install **Google AI Edge Gallery** and run Gemma 3n E2B and E4B. Record tokens/s, time-to-first-token, peak RAM and battery drain.
-- [ ] **Spike A, Bangla speech:** record 30 sample Bangla farmer questions (different speakers, dialects, field noise). Compare:
+- [x] Install Android Studio (latest stable), JDK 17+, Android SDK/NDK, Python 3.11 venv, Git LFS.
+- [x] Get 2–3 test phones: **reference** (6 GB RAM, e.g. a mid-range Samsung A-series or Redmi Note), **low-end** (4 GB), **high-end** (8 GB+).
+- [x] Install **Google AI Edge Gallery** and run Gemma 3n E2B and E4B. Record tokens/s, time-to-first-token, peak RAM and battery drain.
+- [x] **Spike A, Bangla speech:** record 30 sample Bangla farmer questions (different speakers, dialects, field noise). Compare:
   - Gemma 3n native audio → transcript (CER/WER)
   - Whisper-small Bangla fine-tune via whisper.cpp (CER/WER, latency, size)
   - Android offline `SpeechRecognizer` bn-BD (if available on the device)
-- [ ] **Spike B, Bangla generation:** 30 agriculture questions in Bangla → judge the base model's fluency and correctness.
-- [ ] **Spike C, vision:** 30 Bangladeshi crop disease photos → check the base model's zero-shot diagnosis.
-- [ ] **Spike D, conversion:** run a small LoRA on Gemma 3n (a toy dataset) → convert to `.litertlm` → load on the phone. *This is the riskiest step; prove it early.*
-- [ ] Review the **Gemma Terms of Use** and the licences of all datasets and extension documents.
-- [ ] Write ADRs (Architecture Decision Records) in `docs/adr/` for the runtime, ASR route and model size.
+- [x] **Spike B, Bangla generation:** 30 agriculture questions in Bangla → judge the base model's fluency and correctness.
+- [x] **Spike C, vision:** 30 Bangladeshi crop disease photos → check the base model's zero-shot diagnosis.
+- [x] **Spike D, conversion:** run a small LoRA on Gemma 3n (a toy dataset) → convert to `.litertlm` → load on the phone. *This is the riskiest step; prove it early.*
+- [x] Review the **Gemma Terms of Use** and the licences of all datasets and extension documents.
+- [x] Write ADRs (Architecture Decision Records) in `docs/adr/` for the runtime, ASR route and model size.
 
 **Deliverables:** `docs/reports/M0-feasibility.md` with benchmark tables; ADR-0001…0004.
 
 **Exit criteria (go/no-go)**
-- Gemma 3n E2B runs fully offline on the reference phone with time-to-first-token ≤ 5 s and no OOM.
-- An ASR route chosen with Bangla CER ≤ 25% on the spike set (to be improved later).
-- A custom LoRA model loads on the device (Spike D), **or** a documented fallback route works.
+- [x] Gemma 3n E2B runs fully offline on the reference phone with time-to-first-token ≤ 5 s and no OOM.
+- [x] An ASR route chosen with Bangla CER ≤ 25% on the spike set (to be improved later).
+- [x] A custom LoRA model loads on the device (Spike D), **or** a documented fallback route works.
 
 ---
 

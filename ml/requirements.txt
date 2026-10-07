@@ -1,0 +1,35 @@
+# Shalik ML & Fine-Tuning Environment Requirements
+# Python 3.10 or 3.11 recommended with CUDA-capable GPU (16GB+ VRAM for training)
+
+# Core Deep Learning
+torch>=2.2.0
+torchvision>=0.17.0
+torchaudio>=2.2.0
+transformers>=4.48.0
+accelerate>=0.28.0
+peft>=0.10.0
+bitsandbytes>=0.43.0
+
+# Efficient Fine-Tuning (Unsloth & TRL)
+trl>=0.8.0
+# unsloth>=2024.8  # Install via: pip install "unsloth[colab-new] @ git+https://github.com/unslothai/unsloth.git"
+
+# On-Device Conversion & LiteRT
+ai-edge-torch>=0.2.0
+# litert-torch>=0.1.0
+
+# Audio Processing & Evaluation
+librosa>=0.10.1
+soundfile>=0.12.1
+jiwer>=3.0.3
+
+# Data Processing & Utilities
+numpy>=1.24.0
+scipy>=1.11.0
+pillow>=10.2.0
+tqdm>=4.66.0
+pyyaml>=6.0.1
+scikit-learn>=1.4.0
+
+# Tracking & Logging
+# wandb>=0.16.0

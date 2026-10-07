@@ -1,0 +1,74 @@
+{
+  "description": "Taxonomy of major Bangladeshi crop diseases evaluated in Spike C vision benchmark. Aligned with BRRI and BARI research datasets.",
+  "crops": {
+    "rice": {
+      "scientific_name": "Oryza sativa",
+      "classes": [
+        {
+          "id": "rice_healthy",
+          "name_bn": "সুস্থ ধানের পাতা",
+          "name_en": "Healthy Rice Leaf",
+          "is_disease": false
+        },
+        {
+          "id": "rice_blast",
+          "name_bn": "ধানের ব্লাস্ট রোগ",
+          "name_en": "Rice Blast (Leaf / Neck / Node)",
+          "pathogen": "Magnaporthe oryzae",
+          "symptoms": "Spindle-shaped or eye-shaped lesions with grey/whitish centers and dark brown borders."
+        },
+        {
+          "id": "rice_brown_spot",
+          "name_bn": "ধানের বাদামী দাগ রোগ (ব্রাউন স্পট)",
+          "name_en": "Rice Brown Spot",
+          "pathogen": "Bipolaris oryzae",
+          "symptoms": "Circular to oval dark brown lesions with yellow halo."
+        },
+        {
+          "id": "rice_bacterial_leaf_blight",
+          "name_bn": "ধানের ব্যাকটেরিয়াজনিত পাতা পোড়া রোগ (বিএলবি)",
+          "name_en": "Bacterial Leaf Blight (BLB)",
+          "pathogen": "Xanthomonas oryzae pv. oryzae",
+          "symptoms": "Water-soaked lesions on leaf margins turning yellow-orange and wavy drying."
+        },
+        {
+          "id": "rice_sheath_blight",
+          "name_bn": "ধানের শীথ ব্লাইট (খোল পচা/খোলা পোড়া রোগ)",
+          "name_en": "Rice Sheath Blight",
+          "pathogen": "Rhizoctonia solani",
+          "symptoms": "Greenish-grey oval or irregular spots on leaf sheath near water level."
+        },
+        {
+          "id": "rice_tungro",
+          "name_bn": "ধানের টুংরো ভাইরাস রোগ",
+          "name_en": "Rice Tungro Disease",
+          "pathogen": "RTBV + RTSV (vectored by Green Leafhopper)",
+          "symptoms": "Yellowing to orange discoloration starting from leaf tips, stunted growth."
+        }
+      ]
+    },
+    "potato": {
+      "scientific_name": "Solanum tuberosum",
+      "classes": [
+        {
+          "id": "potato_late_blight",
+          "name_bn": "আলুর নাবি ধসা রোগ",
+          "name_en": "Late Blight of Potato",
+          "pathogen": "Phytophthora infestans"
+        },
+        {
+          "id": "potato_early_blight",
+          "name_bn": "আলুর আগাম ধসা রোগ",
+          "name_en": "Early Blight of Potato",
+          "pathogen": "Alternaria solani"
+        }
+      ]
+    },
+    "unknown_reject": {
+      "id": "unknown_or_poor_quality",
+      "name_bn": "অস্পষ্ট ছবি বা উদ্ভিদের অংশ নয়",
+      "name_en": "Out of distribution / Blur / Non-crop",
+      "rejection_threshold": 0.45
+    }
+  }
+}
