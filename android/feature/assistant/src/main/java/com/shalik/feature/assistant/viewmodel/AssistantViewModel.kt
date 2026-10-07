@@ -6,8 +6,10 @@ import androidx.lifecycle.viewModelScope
 import com.shalik.core.data.model.ChatMessage
 import com.shalik.core.data.model.Conversation
 import com.shalik.core.data.model.MessageSender
+import com.shalik.core.data.rag.OfflineRetriever
 import com.shalik.core.data.repository.ChatRepository
 import com.shalik.core.data.repository.FarmerProfileRepository
+import com.shalik.core.data.safety.PesticideSafetyGuard
 import com.shalik.core.llm.EngineState
 import com.shalik.core.llm.LiteRtLmEngine
 import com.shalik.core.llm.ModelManager
@@ -58,7 +60,9 @@ class AssistantViewModel @Inject constructor(
     private val speechToText: SpeechToText,
     private val textToSpeech: BanglaTextToSpeech,
     private val promptBuilder: MultimodalPromptBuilder,
-    private val imageQualityChecker: ImageQualityChecker
+    private val imageQualityChecker: ImageQualityChecker,
+    private val offlineRetriever: OfflineRetriever,
+    private val pesticideSafetyGuard: PesticideSafetyGuard
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(AssistantUiState())
@@ -136,7 +140,6 @@ class AssistantViewModel @Inject constructor(
         }
     }
 
-    // --- Voice Recording & ASR (M2) ---
     fun startVoiceRecording(outputFile: File) {
         viewModelScope.launch {
             audioRecorder.startRecording(outputFile)
@@ -171,7 +174,6 @@ class AssistantViewModel @Inject constructor(
         _uiState.value = _uiState.value.copy(pendingVoiceTranscript = null)
     }
 
-    // --- Image Handling (M2) ---
     fun attachImage(imageUri: String, bitmap: Bitmap?) {
         var warning: String? = null
         if (bitmap != null) {
@@ -191,7 +193,6 @@ class AssistantViewModel @Inject constructor(
         )
     }
 
-    // --- Audio Playback / TTS (M2) ---
     fun playMessageAudio(text: String) {
         textToSpeech.speak(text)
     }
@@ -200,13 +201,13 @@ class AssistantViewModel @Inject constructor(
         textToSpeech.stop()
     }
 
-    // --- Query Execution ---
     fun sendQuery(userText: String) {
         val trimmed = userText.trim()
         if (trimmed.isBlank() || _uiState.value.isGenerating) return
 
         val convId = _uiState.value.currentConversationId ?: return
         val currentImageUri = _uiState.value.attachedImageUri
+        val crop = farmerProfile.value?.primaryCrops?.firstOrNull() ?: "ধান"
 
         generationJob = viewModelScope.launch {
             try {
@@ -231,12 +232,18 @@ class AssistantViewModel @Inject constructor(
                     llmEngine.initialize()
                 }
 
+                // M5: Offline RAG Retrieval
+                val relevantChunks = offlineRetriever.retrieveRelevantPassages(trimmed, crop = crop, topK = 2)
+                val passages = relevantChunks.map { "${it.topic}: ${it.passage} (${it.sourceTitle})" }
+                val citations = relevantChunks.map { it.sourceTitle }.distinct()
+
                 val prompt = promptBuilder.buildPrompt(
                     PromptContext(
                         farmerQuestion = trimmed,
-                        cropName = farmerProfile.value?.primaryCrops?.firstOrNull() ?: "ধান",
+                        cropName = crop,
                         district = farmerProfile.value?.district ?: "",
-                        hasImageAttached = currentImageUri != null
+                        hasImageAttached = currentImageUri != null,
+                        retrievedKnowledgePassages = passages
                     )
                 )
 
@@ -248,11 +255,16 @@ class AssistantViewModel @Inject constructor(
                     )
                 }
 
-                val finalResponse = fullResponseBuilder.toString()
+                // M5: Pesticide Safety Guard Check
+                val rawResponse = fullResponseBuilder.toString()
+                val safetyResult = pesticideSafetyGuard.validateAndSanitize(rawResponse, modelConfidence = 0.92f)
+                val finalResponse = safetyResult.sanitizedResponse
+
                 val shalikMsg = ChatMessage(
                     conversationId = convId,
                     sender = MessageSender.SHALIK,
-                    text = finalResponse
+                    text = finalResponse,
+                    citedSources = citations
                 )
                 chatRepository.saveMessage(shalikMsg)
                 chatRepository.updateConversationPreview(convId, trimmed)
@@ -262,7 +274,6 @@ class AssistantViewModel @Inject constructor(
                     streamingText = ""
                 )
 
-                // Auto-read aloud in Bangla for farmer accessibility
                 textToSpeech.speak(finalResponse)
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(

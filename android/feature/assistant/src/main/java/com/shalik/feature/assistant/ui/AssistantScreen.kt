@@ -403,6 +403,21 @@ fun MessageBubble(
                     color = if (isUser) Color.White else Color(0xFF212121),
                     lineHeight = 22.sp
                 )
+                if (!isUser && message.citedSources.isNotEmpty()) {
+                    Spacer(modifier = Modifier.height(6.dp))
+                    Surface(
+                        color = Color(0xFFF1F8E9),
+                        shape = RoundedCornerShape(6.dp)
+                    ) {
+                        Text(
+                            text = "📚 সূত্র: ${message.citedSources.joinToString(", ")}",
+                            fontSize = 11.sp,
+                            color = AgriculturalGreen,
+                            fontWeight = FontWeight.Medium,
+                            modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
+                        )
+                    }
+                }
             }
         }
     }

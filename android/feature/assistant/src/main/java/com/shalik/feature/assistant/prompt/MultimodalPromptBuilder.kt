@@ -13,7 +13,8 @@ data class PromptContext(
     val hasImageAttached: Boolean = false,
     val classifierTopLabel: String? = null,
     val classifierConfidence: Float? = null,
-    val activeWeatherAlert: String? = null
+    val activeWeatherAlert: String? = null,
+    val retrievedKnowledgePassages: List<String> = emptyList()
 )
 
 @Singleton
@@ -36,6 +37,14 @@ class MultimodalPromptBuilder @Inject constructor() {
         if (context.hasImageAttached && context.classifierTopLabel != null) {
             val confPct = ((context.classifierConfidence ?: 0.9f) * 100).toInt()
             sb.append("পাতার ছবির লক্ষণ শনাক্তকরণ: ${context.classifierTopLabel} (সম্ভাব্যতা $confPct%)\n")
+        }
+
+        if (context.retrievedKnowledgePassages.isNotEmpty()) {
+            sb.append("\nঅনুমোদিত কৃষি সম্প্রসারণ রেফারেন্স তথ্য:\n")
+            context.retrievedKnowledgePassages.forEachIndexed { i, passage ->
+                sb.append("[উৎস ${i + 1}]: $passage\n")
+            }
+            sb.append("অনুগ্রহ করে উপরের বিশ্বস্ত তথ্যের ওপর ভিত্তি করে উত্তর দিন এবং উত্তরের শেষে উৎস উল্লেখ করুন।\n")
         }
 
         sb.append("\nকৃষকের প্রশ্ন: ${context.farmerQuestion}")

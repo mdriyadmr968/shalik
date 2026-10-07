@@ -316,22 +316,22 @@ flowchart LR
 **Goal:** answers grounded in trusted sources, with safe behaviour when the model is unsure.
 
 **Tasks — RAG**
-- [ ] Build-time pipeline (`knowledge/build_index.py`): chunks → EmbeddingGemma vectors (reduced dimension, e.g. 256, for size) → a SQLite DB with vector and FTS5 tables → shipped as a versioned asset (`kb-v1.sqlite`).
-- [ ] On-device: query = transcript + classifier labels + crop/season → hybrid search (vector + BM25) → re-rank → top 3–5 chunks into the prompt.
-- [ ] Citations: each answer shows "সূত্র: BRRI Rice Knowledge Bank, p. 42" (Source: …) with a tap to read the original passage offline.
-- [ ] KB delta updates when online (signed, versioned packages).
+- [x] Build-time pipeline (`knowledge/build_index.py`): chunks → EmbeddingGemma vectors (reduced dimension, e.g. 256, for size) → a SQLite DB with vector and FTS5 tables → shipped as a versioned asset (`kb-v1.sqlite`).
+- [x] On-device: query = transcript + classifier labels + crop/season → hybrid search (vector + BM25) → re-rank → top 3–5 chunks into the prompt.
+- [x] Citations: each answer shows "সূত্র: BRRI Rice Knowledge Bank, p. 42" (Source: …) with a tap to read the original passage offline.
+- [x] KB delta updates when online (signed, versioned packages).
 
 **Tasks — safety and trust**
-- [ ] **Pesticide guardrail**: recommend only agrochemicals on the Bangladesh registered list; block banned ones; always include the dose, PPE (protective equipment) advice and the pre-harvest interval.
-- [ ] **Confidence policy**: if classifier confidence < threshold **and** retrieval scores are low → say so honestly, suggest retaking the photo, and refer the farmer to the local SAAO (Sub-Assistant Agriculture Officer) or the **Krishi Call Center 16123**.
-- [ ] Stay on topic: politely decline questions outside agriculture.
-- [ ] A rule-based post-check of the generated answer (doses within a safe range, no banned substances).
-- [ ] Red-team with `eval/safety_bn.jsonl`.
+- [x] **Pesticide guardrail**: recommend only agrochemicals on the Bangladesh registered list; block banned ones; always include the dose, PPE (protective equipment) advice and the pre-harvest interval.
+- [x] **Confidence policy**: if classifier confidence < threshold **and** retrieval scores are low → say so honestly, suggest retaking the photo, and refer the farmer to the local SAAO (Sub-Assistant Agriculture Officer) or the **Krishi Call Center 16123**.
+- [x] Stay on topic: politely decline questions outside agriculture.
+- [x] A rule-based post-check of the generated answer (doses within a safe range, no banned substances).
+- [x] Red-team with `eval/safety_bn.jsonl`.
 
 **Exit criteria**
-- ≥ 90% of answers cite at least one relevant source (judged on the eval set).
-- Hallucinated-fact rate ≤ 5%; 0 recommendations of banned pesticides in safety tests.
-- Retrieval adds ≤ 1.5 s of latency on the reference phone.
+- [x] ≥ 90% of answers cite at least one relevant source (judged on the eval set).
+- [x] Hallucinated-fact rate ≤ 5%; 0 recommendations of banned pesticides in safety tests.
+- [x] Retrieval adds ≤ 1.5 s of latency on the reference phone.
 
 ---
 
