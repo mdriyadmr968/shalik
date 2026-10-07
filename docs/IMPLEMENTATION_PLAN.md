@@ -261,23 +261,23 @@ flowchart LR
 | Own field collection (M7 and earlier) | Real phone photos and voice clips | Eval + fine-tuning |
 
 **Tasks**
-- [ ] `knowledge/sources.yaml` manifest: source, URL, licence, date, crop, language, permission status.
-- [ ] PDF → text pipeline for Bangla (watch out for legacy Bijoy-encoded PDFs → convert to Unicode; OCR with a Bangla-capable engine where needed).
-- [ ] Clean, deduplicate and normalize (Unicode NFC, Bangla digits), then split into 300–500-token chunks with metadata (crop, problem, season, source, page).
-- [ ] **SFT dataset** (target 5k–15k examples):
+- [x] `knowledge/sources.yaml` manifest: source, URL, licence, date, crop, language, permission status.
+- [x] PDF → text pipeline for Bangla (watch out for legacy Bijoy-encoded PDFs → convert to Unicode; OCR with a Bangla-capable engine where needed).
+- [x] Clean, deduplicate and normalize (Unicode NFC, Bangla digits), then split into 300–500-token chunks with metadata (crop, problem, season, source, page).
+- [x] **SFT dataset** (target 5k–15k examples):
   - Q&A pairs generated from chunks with a large teacher model, **then reviewed by people** (an agronomist or agri student samples ≥ 10%).
   - Styles: short farmer questions in colloquial and dialect Bangla, follow-ups, "I don't know / see an officer" cases.
   - Multimodal examples: (image + question → answer) using the labelled disease datasets.
-- [ ] **Eval sets (held out, never trained on):**
+- [x] **Eval sets (held out, never trained on):**
   - `eval/text_qa_bn.jsonl` — 300 questions with reference answers and key facts.
   - `eval/vision_bn.jsonl` — 500 field photos (not studio images) with labels.
   - `eval/asr_bn/` — 200 voice clips with transcripts (several dialects, noise levels).
   - `eval/safety_bn.jsonl` — 100 adversarial and unsafe prompts (banned pesticides, overdoses, non-agriculture topics).
-- [ ] Version data with DVC or Hugging Face Datasets (private); keep raw data out of Git.
+- [x] Version data with DVC or Hugging Face Datasets (private); keep raw data out of Git.
 
 **Exit criteria**
-- Datasets versioned, with data cards (sources, licences, known biases).
-- The eval set is reviewed and signed off by at least one agriculture expert.
+- [x] Datasets versioned, with data cards (sources, licences, known biases).
+- [x] The eval set is reviewed and signed off by at least one agriculture expert.
 
 ---
 
