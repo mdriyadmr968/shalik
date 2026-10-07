@@ -340,17 +340,17 @@ flowchart LR
 **Goal:** Shalik becomes the "last mile" for climate alerts and turns them into farm actions.
 
 **Tasks**
-- [ ] Define the **alert contract** in `alerts/schema/alert.schema.json`, using the Common Alerting Protocol (CAP) as a base: `id, type (heat|flood|cyclone|rain), severity, area (district/upazila codes), valid_from, valid_to, message_bn, source, signature`.
-- [ ] **Channel 1, opportunistic sync:** a WorkManager job runs whenever any network appears and fetches signed alerts for the user's district from the Idea #3 service. Upstream sources: FFWC/BWDB flood forecasts and BMD heat/CAP warnings.
-- [ ] **Channel 2, SMS fallback:** parse structured SMS (e.g. `SHALIK|FLOOD|SEV3|DIST=...`) from a known sender ID; verify with a short signature or HMAC.
-- [ ] *(Stretch)* **Channel 3:** peer-to-peer sharing of alerts over Wi-Fi Direct or Bluetooth between nearby Shalik users.
-- [ ] Alert UI: full-screen warning for high severity, spoken in Bangla, with an offline alert history.
-- [ ] **Alert-aware advice:** active alerts are added to the prompt context, e.g. a flood warning leads to "harvest mature Boro now; move seed and fertilizer to a high place"; a heatwave leads to irrigation timing advice and heat-stress guidance for workers.
-- [ ] Pre-written, agronomist-approved action templates for each alert type × crop × growth stage (these must not depend only on the LLM).
+- [x] Define the **alert contract** in `alerts/schema/alert.schema.json`, using the Common Alerting Protocol (CAP) as a base: `id, type (heat|flood|cyclone|rain), severity, area (district/upazila codes), valid_from, valid_to, message_bn, source, signature`.
+- [x] **Channel 1, opportunistic sync:** a WorkManager job runs whenever any network appears and fetches signed alerts for the user's district from the Idea #3 service. Upstream sources: FFWC/BWDB flood forecasts and BMD heat/CAP warnings.
+- [x] **Channel 2, SMS fallback:** parse structured SMS (e.g. `SHALIK|FLOOD|SEV3|DIST=...`) from a known sender ID; verify with a short signature or HMAC.
+- [x] *(Stretch)* **Channel 3:** peer-to-peer sharing of alerts over Wi-Fi Direct or Bluetooth between nearby Shalik users.
+- [x] Alert UI: full-screen warning for high severity, spoken in Bangla, with an offline alert history.
+- [x] **Alert-aware advice:** active alerts are added to the prompt context, e.g. a flood warning leads to "harvest mature Boro now; move seed and fertilizer to a high place"; a heatwave leads to irrigation timing advice and heat-stress guidance for workers.
+- [x] Pre-written, agronomist-approved action templates for each alert type × crop × growth stage (these must not depend only on the LLM).
 
 **Exit criteria**
-- A test alert sent through the sync and SMS channels shows up on the device within 2 minutes of connectivity.
-- Alert-aware answers are rated correct by an expert for 20 test scenarios.
+- [x] A test alert sent through the sync and SMS channels shows up on the device within 2 minutes of connectivity.
+- [x] Alert-aware answers are rated correct by an expert for 20 test scenarios.
 
 ---
 

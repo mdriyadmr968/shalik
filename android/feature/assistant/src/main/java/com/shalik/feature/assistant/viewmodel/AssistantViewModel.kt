@@ -7,9 +7,11 @@ import com.shalik.core.data.model.ChatMessage
 import com.shalik.core.data.model.Conversation
 import com.shalik.core.data.model.MessageSender
 import com.shalik.core.data.rag.OfflineRetriever
+import com.shalik.core.data.repository.AlertRepository
 import com.shalik.core.data.repository.ChatRepository
 import com.shalik.core.data.repository.FarmerProfileRepository
 import com.shalik.core.data.safety.PesticideSafetyGuard
+import kotlinx.coroutines.flow.firstOrNull
 import com.shalik.core.llm.EngineState
 import com.shalik.core.llm.LiteRtLmEngine
 import com.shalik.core.llm.ModelManager
@@ -62,7 +64,8 @@ class AssistantViewModel @Inject constructor(
     private val promptBuilder: MultimodalPromptBuilder,
     private val imageQualityChecker: ImageQualityChecker,
     private val offlineRetriever: OfflineRetriever,
-    private val pesticideSafetyGuard: PesticideSafetyGuard
+    private val pesticideSafetyGuard: PesticideSafetyGuard,
+    private val alertRepository: AlertRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(AssistantUiState())
@@ -237,12 +240,25 @@ class AssistantViewModel @Inject constructor(
                 val passages = relevantChunks.map { "${it.topic}: ${it.passage} (${it.sourceTitle})" }
                 val citations = relevantChunks.map { it.sourceTitle }.distinct()
 
+                // M6: Active Climate & Weather Alert Context
+                val userDistrict = farmerProfile.value?.district ?: ""
+                val activeAlerts = if (userDistrict.isNotBlank()) {
+                    alertRepository.getAlertsForDistrict(userDistrict).firstOrNull() ?: emptyList()
+                } else {
+                    emptyList()
+                }
+                val topAlert = activeAlerts.firstOrNull()
+                val alertContextString = topAlert?.let {
+                    "${it.severity.labelBn}: ${it.messageBn} (উৎস: ${it.source})"
+                }
+
                 val prompt = promptBuilder.buildPrompt(
                     PromptContext(
                         farmerQuestion = trimmed,
                         cropName = crop,
-                        district = farmerProfile.value?.district ?: "",
+                        district = userDistrict,
                         hasImageAttached = currentImageUri != null,
+                        activeWeatherAlert = alertContextString,
                         retrievedKnowledgePassages = passages
                     )
                 )

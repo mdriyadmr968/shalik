@@ -3,11 +3,12 @@ package com.shalik.core.data.di
 import android.content.Context
 import androidx.room.Room
 import com.shalik.core.data.database.ShalikDatabase
+import com.shalik.core.data.database.dao.AlertDao
 import com.shalik.core.data.database.dao.ChatDao
 import com.shalik.core.data.database.dao.FarmerProfileDao
 import dagger.Module
 import dagger.Provides
-import dagger.hilt.InstallIn
+import dagger.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
@@ -31,4 +32,7 @@ object DataModule {
 
     @Provides
     fun provideFarmerProfileDao(database: ShalikDatabase): FarmerProfileDao = database.farmerProfileDao()
+
+    @Provides
+    fun provideAlertDao(database: ShalikDatabase): AlertDao = database.alertDao()
 }
