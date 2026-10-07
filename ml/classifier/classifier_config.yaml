@@ -1,0 +1,35 @@
+# Crop Disease Classifier Configuration (Milestone M4)
+
+architecture:
+  backbone: "efficientnet_lite0" # Or mobilenet_v3_small
+  pretrained: true
+  num_classes: 7
+  input_resolution: 224
+
+classes:
+  - "rice_healthy"
+  - "rice_blast"
+  - "rice_brown_spot"
+  - "rice_bacterial_leaf_blight"
+  - "rice_sheath_blight"
+  - "rice_tungro"
+  - "unknown_or_poor_quality" # Out-of-distribution rejection class
+
+augmentation:
+  random_crop: true
+  color_jitter:
+    brightness: 0.3
+    contrast: 0.3
+    saturation: 0.2
+  random_rotation_degrees: 30
+  field_blur_simulation: true
+  shadow_simulation: true
+
+training:
+  epochs: 25
+  batch_size: 32
+  learning_rate: 1.0e-3
+  weight_decay: 1.0e-4
+  temperature_scaling_calibration: true
+  export_format: "tflite_int8"
+  max_model_size_mb: 5.0

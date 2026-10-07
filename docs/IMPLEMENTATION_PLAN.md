@@ -286,28 +286,28 @@ flowchart LR
 **Goal:** a fine-tuned, quantized on-device model and a disease classifier that measurably beat the baseline.
 
 **Tasks — LLM**
-- [ ] Training setup in `ml/finetune/`: Unsloth + TRL `SFTTrainer`, config-driven (YAML), seeded, logged to W&B or MLflow.
-- [ ] **Stage 1, text LoRA** (language layers): r=16–32, alpha=r, lr ≈ 2e-4, 1–3 epochs; mixes the agriculture SFT with ~10–20% general Bangla instructions so the model doesn't forget general language skills.
-- [ ] **Stage 2, vision LoRA** (vision + language layers) on image-question-answer triples.
-- [ ] *(Optional)* **Stage 3, audio LoRA** if Gemma 3n is the chosen ASR route and Bangla CER needs to improve.
-- [ ] Merge adapters → convert with litert-torch → int4/int8 quantization → `.litertlm`.
-- [ ] Check after quantization: the eval-score drop must be ≤ 3 points versus the fp16 model.
-- [ ] Model card: training data, intended use, limits, eval results.
+- [x] Training setup in `ml/finetune/`: Unsloth + TRL `SFTTrainer`, config-driven (YAML), seeded, logged to W&B or MLflow.
+- [x] **Stage 1, text LoRA** (language layers): r=16–32, alpha=r, lr ≈ 2e-4, 1–3 epochs; mixes the agriculture SFT with ~10–20% general Bangla instructions so the model doesn't forget general language skills.
+- [x] **Stage 2, vision LoRA** (vision + language layers) on image-question-answer triples.
+- [x] *(Optional)* **Stage 3, audio LoRA** if Gemma 3n is the chosen ASR route and Bangla CER needs to improve.
+- [x] Merge adapters → convert with litert-torch → int4/int8 quantization → `.litertlm`.
+- [x] Check after quantization: the eval-score drop must be ≤ 3 points versus the fp16 model.
+- [x] Model card: training data, intended use, limits, eval results.
 
 **Tasks — classifier**
-- [ ] Train EfficientNet-Lite0/B0 (or MobileNetV3) on Bangladeshi disease datasets with strong field-condition augmentation (blur, glare, shadows, partial leaves).
-- [ ] Include an **"unknown / not a plant / bad photo"** class.
-- [ ] Calibrate confidence (temperature scaling); export to LiteRT int8 (< 10 MB).
-- [ ] Evaluate on **cross-dataset** splits (train on dataset A, test on B) to measure how well it handles real-world photos.
+- [x] Train EfficientNet-Lite0/B0 (or MobileNetV3) on Bangladeshi disease datasets with strong field-condition augmentation (blur, glare, shadows, partial leaves).
+- [x] Include an **"unknown / not a plant / bad photo"** class.
+- [x] Calibrate confidence (temperature scaling); export to LiteRT int8 (< 10 MB).
+- [x] Evaluate on **cross-dataset** splits (train on dataset A, test on B) to measure how well it handles real-world photos.
 
 **Tasks — evaluation harness** (`ml/eval/`)
-- [ ] Automated scoring: key-fact recall, LLM-as-judge rubric (Bangla fluency, correctness, actionability, safety), plus a human spot check.
-- [ ] Compare: base Gemma 3n vs. LoRA vs. LoRA+RAG (once M5 is done).
+- [x] Automated scoring: key-fact recall, LLM-as-judge rubric (Bangla fluency, correctness, actionability, safety), plus a human spot check.
+- [x] Compare: base Gemma 3n vs. LoRA vs. LoRA+RAG (once M5 is done).
 
 **Exit criteria**
-- Fine-tuned model improves text Q&A by **≥ 15 points** (rubric score out of 100) over the base model.
-- Classifier top-1 accuracy **≥ 85%** in-domain and **≥ 70%** cross-dataset, with ECE ≤ 0.08.
-- Total on-device model storage ≤ 3.5 GB; peak RAM ≤ 3 GB on the reference phone.
+- [x] Fine-tuned model improves text Q&A by **≥ 15 points** (rubric score out of 100) over the base model.
+- [x] Classifier top-1 accuracy **≥ 85%** in-domain and **≥ 70%** cross-dataset, with ECE ≤ 0.08.
+- [x] Total on-device model storage ≤ 3.5 GB; peak RAM ≤ 3 GB on the reference phone.
 
 ---
 
