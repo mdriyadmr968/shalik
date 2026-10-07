@@ -374,15 +374,15 @@ flowchart LR
 ### M8 — Release + portfolio (Weeks 21–22)
 
 **Tasks**
-- [ ] Release build: R8/ProGuard, signed AAB/APK, version 1.0.0.
-- [ ] Distribution:
-  - Google Play (app) + model download.
-  - **Offline side-load kit**: APK + model + KB on an SD card / USB for extension officers and Union Digital Centers (UDCs); in-app "share Shalik with a nearby phone".
-- [ ] Privacy policy (Bangla + English): no data leaves the phone by default.
-- [ ] Publish the LoRA adapters and model card on Hugging Face (if licences allow), plus the eval harness and benchmark results.
-- [ ] Docs: README, architecture, a "how to reproduce training" guide, an on-device benchmark table.
-- [ ] Demo video (2–3 min): a farmer in the field with airplane mode visibly on.
-- [ ] Technical write-up / blog post: the challenges (Bangla ASR, quantization, RAM limits) and results.
+- [x] Release build: R8/ProGuard, signed AAB/APK, version 1.0.0.
+- [x] Distribution:
+  - [x] Google Play (app) + model download.
+  - [x] **Offline side-load kit**: APK + model + KB on an SD card / USB for extension officers and Union Digital Centers (UDCs); in-app "share Shalik with a nearby phone".
+- [x] Privacy policy (Bangla + English): no data leaves the phone by default.
+- [x] Publish the LoRA adapters and model card on Hugging Face (if licences allow), plus the eval harness and benchmark results.
+- [x] Docs: README, architecture, a "how to reproduce training" guide, an on-device benchmark table.
+- [x] Demo video (2–3 min): a farmer in the field with airplane mode visibly on.
+- [x] Technical write-up / blog post: the challenges (Bangla ASR, quantization, RAM limits) and results.
 
 **Exit criteria:** v1.0 tagged; anyone can reproduce training and evaluation from the repo.
 
