@@ -13,6 +13,8 @@ import { FarmerProfile } from '../../../core/data/models/FarmerProfile';
 import { Colors } from '../../../theme/colors';
 import { LanguageManager } from '../../../i18n/LanguageManager';
 import { Language } from '../../../i18n/translations';
+import { AuthManager } from '../../../core/auth/AuthManager';
+import { User, UserRoleDetails } from '../../../core/auth/models/User';
 
 interface ProfileScreenProps {
   repository?: FarmerProfileRepository;
@@ -36,6 +38,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
   const [upazila, setUpazila] = useState(profile.upazila);
   const [cropsText, setCropsText] = useState(profile.primaryCrops.join(', '));
   const [lang, setLang] = useState<Language>(LanguageManager.getInstance().getLanguage());
+  const [currentUser, setCurrentUser] = useState<User | null>(AuthManager.getInstance().getCurrentUser());
   const [savedSuccess, setSavedSuccess] = useState(false);
 
   const t = LanguageManager.getInstance().getTranslations();
@@ -53,7 +56,14 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
       setLang(newLang);
     });
 
-    return () => unsubLang();
+    const unsubAuth = AuthManager.getInstance().subscribe(user => {
+      setCurrentUser(user);
+    });
+
+    return () => {
+      unsubLang();
+      unsubAuth();
+    };
   }, [repository]);
 
   const handleLanguageChange = async (selectedLang: Language) => {
@@ -183,6 +193,32 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
             <Text style={styles.saveBtnText}>{t.saveButton}</Text>
           </TouchableOpacity>
         </View>
+
+        {/* Current Auth Account & Sign Out */}
+        {currentUser && (
+          <View style={styles.accountCard}>
+            <View style={styles.accountHeader}>
+              <View>
+                <Text style={styles.accountTitle}>👤 {currentUser.name}</Text>
+                <Text style={styles.accountPhone}>{currentUser.phone}</Text>
+              </View>
+              <View style={styles.accountBadge}>
+                <Text style={styles.accountBadgeText}>
+                  {lang === 'en'
+                    ? UserRoleDetails[currentUser.role]?.labelEn
+                    : UserRoleDetails[currentUser.role]?.labelBn}
+                </Text>
+              </View>
+            </View>
+
+            <TouchableOpacity
+              style={styles.logoutBtn}
+              onPress={() => AuthManager.getInstance().logout()}
+            >
+              <Text style={styles.logoutBtnText}>{t.logoutButton}</Text>
+            </TouchableOpacity>
+          </View>
+        )}
 
         <View style={styles.infoCard}>
           <Text style={styles.infoTitle}>{t.offlineSecurityTitle}</Text>
@@ -330,5 +366,56 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: Colors.textSecondary,
     lineHeight: 18
+  },
+  accountCard: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 12,
+    padding: 16,
+    borderWidth: 1,
+    borderColor: '#EEEEEE',
+    elevation: 2,
+    marginBottom: 16
+  },
+  accountHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 12
+  },
+  accountTitle: {
+    fontSize: 15,
+    fontWeight: 'bold',
+    color: Colors.textPrimary
+  },
+  accountPhone: {
+    fontSize: 12,
+    color: Colors.textSecondary,
+    marginTop: 2
+  },
+  accountBadge: {
+    backgroundColor: '#E8F5E9',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 6,
+    borderWidth: 1,
+    borderColor: '#C8E6C9'
+  },
+  accountBadgeText: {
+    fontSize: 11,
+    fontWeight: 'bold',
+    color: Colors.agriculturalGreen
+  },
+  logoutBtn: {
+    backgroundColor: '#FFEBEE',
+    borderWidth: 1,
+    borderColor: '#FFCDD2',
+    paddingVertical: 10,
+    borderRadius: 8,
+    alignItems: 'center'
+  },
+  logoutBtnText: {
+    color: '#D32F2F',
+    fontWeight: 'bold',
+    fontSize: 14
   }
 });

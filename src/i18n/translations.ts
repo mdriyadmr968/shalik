@@ -53,6 +53,39 @@ export interface Translations {
   saveButton: string;
   offlineSecurityTitle: string;
   offlineSecurityDesc: string;
+
+  // Authentication & RBAC Management
+  tabAdmin: string;
+  authTitle: string;
+  authSubtitle: string;
+  loginTab: string;
+  registerTab: string;
+  phoneLabel: string;
+  phonePlaceholder: string;
+  pinLabel: string;
+  pinPlaceholder: string;
+  nameLabel: string;
+  namePlaceholder: string;
+  roleLabel: string;
+  roleFarmer: string;
+  roleOfficer: string;
+  roleAdmin: string;
+  loginButton: string;
+  registerButton: string;
+  quickDemoLogin: string;
+  logoutButton: string;
+  currentRolePrefix: string;
+  managementTitle: string;
+  broadcastAlertTitle: string;
+  broadcastAlertDesc: string;
+  alertMessageBn: string;
+  alertMessageEn: string;
+  alertSeverity: string;
+  broadcastButton: string;
+  telemetryTitle: string;
+  telemetryDesc: string;
+  userManagementTitle: string;
+  changeRole: string;
 }
 
 export const translations: Record<Language, Translations> = {
@@ -114,7 +147,40 @@ export const translations: Record<Language, Translations> = {
     saveButton: 'সংরক্ষণ করুন',
     offlineSecurityTitle: '🔒 সম্পূর্ণ অফলাইন ও নিরাপদ',
     offlineSecurityDesc:
-      'শালিক-এ আপনার কোনো তথ্য ক্লাউড বা ইন্টারনেটে পাঠানো হয় না। আপনার সমস্ত তথ্য এই ফোনে সুরক্ষিতভাবে সংরক্ষিত থাকে।'
+      'শালিক-এ আপনার কোনো তথ্য ক্লাউড বা ইন্টারনেটে পাঠানো হয় না। আপনার সমস্ত তথ্য এই ফোনে সুরক্ষিতভাবে সংরক্ষিত থাকে।',
+
+    // Authentication & RBAC Management
+    tabAdmin: 'অফিসার প্যানেল',
+    authTitle: 'শালিক একাউন্ট',
+    authSubtitle: 'অফলাইন মোবাইল নম্বর ও ৪ ডিজিটের পিন',
+    loginTab: 'লগইন',
+    registerTab: 'নতুন নিবন্ধন',
+    phoneLabel: 'মোবাইল নম্বর:',
+    phonePlaceholder: 'যেমন: 01711000001',
+    pinLabel: '৪ ডিজিটের গোপন পিন:',
+    pinPlaceholder: '••••',
+    nameLabel: 'আপনার পুরো নাম:',
+    namePlaceholder: 'যেমন: করিম মিয়া',
+    roleLabel: 'ভূমিকা / পদবি (Role):',
+    roleFarmer: '🌾 কৃষক',
+    roleOfficer: '🛡️ উপ-সহকারী কৃষি কর্মকর্তা (SAAO)',
+    roleAdmin: '⚙️ সিস্টেম প্রশাসক',
+    loginButton: 'প্রবেশ করুন',
+    registerButton: 'একাউন্ট খুলুন',
+    quickDemoLogin: '⚡ দ্রুত ডেমো লগইন (১-ট্যাপ):',
+    logoutButton: '🚪 লগআউট',
+    currentRolePrefix: 'বর্তমান পদবি: ',
+    managementTitle: 'অফিসার ও অ্যাডমিন কন্ট্রোল রুম',
+    broadcastAlertTitle: 'জরুরি কৃষি সতর্কতা প্রচার',
+    broadcastAlertDesc: 'এলাকার কৃষকদের জন্য তাৎক্ষণিক সতর্কবার্তা জারি করুন',
+    alertMessageBn: 'সতর্কবার্তা (বাংলা):',
+    alertMessageEn: 'সতর্কবার্তা (ইংরেজি):',
+    alertSeverity: 'সতর্কতার তীব্রতা:',
+    broadcastButton: '📢 সতর্কতা প্রচার করুন',
+    telemetryTitle: 'ফিল্ড টেলিমেট্রি ও সিস্টেম হেলথ',
+    telemetryDesc: 'মডেল প্রতিক্রিয়া সময়, অন-ডিভাইস ভেক্টর ক্যাশ ও নিরাপত্তা গার্ডরেল',
+    userManagementTitle: 'ব্যবহারকারী ও রোল নিয়ন্ত্রণ',
+    changeRole: 'পদবি পরিবর্তন'
   },
   en: {
     // Navigation & Tabs
@@ -174,6 +240,39 @@ export const translations: Record<Language, Translations> = {
     saveButton: 'Save Changes',
     offlineSecurityTitle: '🔒 100% Offline & Private',
     offlineSecurityDesc:
-      'Shalik operates entirely on-device without sending data to the cloud. Your agricultural data and voice notes remain safe on this phone.'
+      'Shalik operates entirely on-device without sending data to the cloud. Your agricultural data and voice notes remain safe on this phone.',
+
+    // Authentication & RBAC Management
+    tabAdmin: 'Officer Panel',
+    authTitle: 'Shalik Account',
+    authSubtitle: 'Offline Mobile & 4-Digit Secret PIN',
+    loginTab: 'Sign In',
+    registerTab: 'Register',
+    phoneLabel: 'Mobile Number:',
+    phonePlaceholder: 'e.g. 01711000001',
+    pinLabel: '4-Digit Secret PIN:',
+    pinPlaceholder: '••••',
+    nameLabel: 'Full Name:',
+    namePlaceholder: 'e.g. Karim Mia',
+    roleLabel: 'User Role Assignment:',
+    roleFarmer: '🌾 Farmer',
+    roleOfficer: '🛡️ Agricultural Extension Officer (SAAO)',
+    roleAdmin: '⚙️ System Administrator',
+    loginButton: 'Sign In',
+    registerButton: 'Create Account',
+    quickDemoLogin: '⚡ Quick Demo Login (1-Tap):',
+    logoutButton: '🚪 Sign Out',
+    currentRolePrefix: 'Current Role: ',
+    managementTitle: 'Officer & Admin Command Center',
+    broadcastAlertTitle: 'Broadcast Emergency Alert',
+    broadcastAlertDesc: 'Publish urgent hazard and weather advisories to regional farmers',
+    alertMessageBn: 'Alert Message (Bengali):',
+    alertMessageEn: 'Alert Message (English):',
+    alertSeverity: 'Severity Level:',
+    broadcastButton: '📢 Broadcast Advisory',
+    telemetryTitle: 'Field Telemetry & Health',
+    telemetryDesc: 'Model Latency, On-Device Vector Cache & Guardrail Integrity',
+    userManagementTitle: 'User & Role Access Control',
+    changeRole: 'Change Role'
   }
 };

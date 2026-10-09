@@ -64,6 +64,19 @@ This is the full **React Native & TypeScript** conversion of **Shalik (শাল
 - **Alert Sync (`AlertSyncWorker.ts`):**
   - Background synchronization for signed disaster notices and automatic expiration purging.
 
+### 6. Offline Authentication & RBAC Authorization (`src/core/auth/`)
+- **100% Air-Gapped Security (`PinHasher.ts`):**
+  - Salted SHA-256 cryptographic PIN hashing implemented in pure TypeScript without cloud dependencies.
+  - Strict Bangladeshi mobile number format validation (`013`-`019` prefixes).
+- **Multi-Role RBAC System (`models/User.ts`, `AuthManager.ts`):**
+  - **🌾 Farmer (`FARMER`)**: Ask crop diagnosis queries, view disaster alerts, manage profile.
+  - **🛡️ Extension Officer (`OFFICER` - SAAO)**: Broadcast emergency regional alerts, inspect field telemetry diagnostics.
+  - **⚙️ Administrator (`ADMIN`)**: Full system control, promote/manage user roles, review guardrail rules.
+- **Seeded Demo Accounts (Available with 1-Tap Quick Login):**
+  - **Farmer**: Phone `01711000001` | PIN `1234` (*Karim Mia*)
+  - **SAAO Officer**: Phone `01811000002` | PIN `5678` (*Dr. Rafiqul Islam*)
+  - **Administrator**: Phone `01911000003` | PIN `9999` (*Agri Admin*)
+
 ---
 
 ## 🚀 Running the Project
@@ -87,7 +100,13 @@ npm test
 npm run type-check
 ```
 
-### 4. Start Metro Bundler
+### 4. Low-Resource Web Preview (Vite)
+```bash
+npm run web
+```
+Instant launch at `http://localhost:5173/` consuming negligible RAM and CPU.
+
+### 5. Start Mobile Metro Bundler
 ```bash
 npm start
 ```

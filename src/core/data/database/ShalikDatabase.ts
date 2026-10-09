@@ -1,6 +1,9 @@
 import { ChatDao } from './dao/ChatDao';
 import { AlertDao } from './dao/AlertDao';
 import { FarmerProfileDao } from './dao/FarmerProfileDao';
+import { UserDao } from '../../auth/database/UserDao';
+import { User, UserRole } from '../../auth/models/User';
+import { PinHasher } from '../../auth/security/PinHasher';
 import { ConversationEntity, ChatMessageEntity, AlertEntity, FarmerProfileEntity } from './Entities';
 
 type Listener = () => void;
@@ -11,6 +14,7 @@ export class ShalikDatabase {
   private conversations: Map<number, ConversationEntity> = new Map();
   private messages: Map<number, ChatMessageEntity> = new Map();
   private alerts: Map<string, AlertEntity> = new Map();
+  private users: Map<string, User> = new Map();
   private farmerProfile: FarmerProfileEntity | null = null;
 
   private conversationIdSeq = 1;
@@ -94,6 +98,42 @@ export class ShalikDatabase {
     ];
 
     initialAlerts.forEach(a => this.alerts.set(a.id, a));
+
+    // Seed default demo users for offline authentication (Farmer, SAAO Officer, Admin)
+    const seedUsers: User[] = [
+      {
+        id: 'usr_farmer_1',
+        phone: '01711000001',
+        name: 'করিম মিয়া (Karim Mia)',
+        pinHash: PinHasher.hashPin('1234'),
+        role: UserRole.FARMER,
+        district: 'কুড়িগ্রাম',
+        upazila: 'চিলমারী',
+        createdAt: now - (86400000 * 10)
+      },
+      {
+        id: 'usr_officer_1',
+        phone: '01811000002',
+        name: 'ড. রফিকুল ইসলাম (Dr. Rafiqul Islam)',
+        pinHash: PinHasher.hashPin('5678'),
+        role: UserRole.OFFICER,
+        district: 'কুড়িগ্রাম',
+        upazila: 'চিলমারী',
+        createdAt: now - (86400000 * 30)
+      },
+      {
+        id: 'usr_admin_1',
+        phone: '01911000003',
+        name: 'কৃষি সিস্টেম প্রশাসক (Agri Admin)',
+        pinHash: PinHasher.hashPin('9999'),
+        role: UserRole.ADMIN,
+        district: 'ঢাকা',
+        upazila: 'রমনা',
+        createdAt: now - (86400000 * 60)
+      }
+    ];
+
+    seedUsers.forEach(u => this.users.set(u.id, u));
   }
 
   public chatDao(): ChatDao {
@@ -207,6 +247,38 @@ export class ShalikDatabase {
             this.alerts.delete(id);
           }
         }
+        this.notify();
+      }
+    };
+  }
+
+  public userDao(): UserDao {
+    return {
+      getUserByPhone: async (phone: string): Promise<User | null> => {
+        const cleaned = phone.replace(/[\s-]/g, '');
+        for (const user of this.users.values()) {
+          if (user.phone.replace(/[\s-]/g, '') === cleaned) {
+            return user;
+          }
+        }
+        return null;
+      },
+      getUserById: async (id: string): Promise<User | null> => {
+        return this.users.get(id) || null;
+      },
+      getAllUsers: async (): Promise<User[]> => {
+        return Array.from(this.users.values()).sort((a, b) => b.createdAt - a.createdAt);
+      },
+      insertUser: async (user: User): Promise<void> => {
+        this.users.set(user.id, user);
+        this.notify();
+      },
+      updateUser: async (user: User): Promise<void> => {
+        this.users.set(user.id, user);
+        this.notify();
+      },
+      deleteUser: async (id: string): Promise<void> => {
+        this.users.delete(id);
         this.notify();
       }
     };
