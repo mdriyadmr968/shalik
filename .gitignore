@@ -47,3 +47,13 @@ knowledge/build/
 Thumbs.db
 dist/
 *.zip
+
+# --- Node / React Native ---
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+coverage/
+.expo/
+.metro/
+

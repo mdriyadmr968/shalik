@@ -1,0 +1,77 @@
+export interface PromptContext {
+  farmerQuestion: string;
+  cropName?: string;
+  district?: string;
+  hasImageAttached?: boolean;
+  classifierTopLabel?: string | null;
+  classifierConfidence?: number | null;
+  activeWeatherAlert?: string | null;
+  retrievedKnowledgePassages?: string[];
+}
+
+export class MultimodalPromptBuilder {
+  public buildPrompt(context: PromptContext): string {
+    const crop = context.cropName || 'ধান';
+    const district = context.district || '';
+    const season = this.determineCurrentBanglaSeason();
+
+    const parts: string[] = [];
+
+    let contextLine = `বর্তমান প্রেক্ষাপট: ঋতু - ${season}, ফসল - ${crop}`;
+    if (district.trim().length > 0) {
+      contextLine += `, জেলা - ${district}`;
+    }
+    parts.push(contextLine);
+
+    if (context.activeWeatherAlert) {
+      parts.push(`⚠️ সক্রিয় দুর্যোগ সতর্কতা: ${context.activeWeatherAlert}`);
+    }
+
+    if (context.hasImageAttached && context.classifierTopLabel) {
+      const confPct = Math.round((context.classifierConfidence ?? 0.9) * 100);
+      parts.push(
+        `পাতার ছবির লক্ষণ শনাক্তকরণ: ${context.classifierTopLabel} (সম্ভাব্যতা ${confPct}%)`
+      );
+    }
+
+    if (context.retrievedKnowledgePassages && context.retrievedKnowledgePassages.length > 0) {
+      parts.push('\nঅনুমোদিত কৃষি সম্প্রসারণ রেফারেন্স তথ্য:');
+      context.retrievedKnowledgePassages.forEach((passage, i) => {
+        parts.push(`[উৎস ${i + 1}]: ${passage}`);
+      });
+      parts.push(
+        'অনুগ্রহ করে উপরের বিশ্বস্ত তথ্যের ওপর ভিত্তি করে উত্তর দিন এবং উত্তরের শেষে উৎস উল্লেখ করুন।'
+      );
+    }
+
+    parts.push(`\nকৃষকের প্রশ্ন: ${context.farmerQuestion}`);
+
+    return parts.join('\n');
+  }
+
+  public determineCurrentBanglaSeason(date: Date = new Date()): string {
+    const month = date.getMonth() + 1; // 1-12
+    switch (month) {
+      case 4:
+      case 5:
+        return 'গ্রীষ্মকাল (বোরো কর্তন ও আউশ আবাদ)';
+      case 6:
+      case 7:
+        return 'বর্ষাকাল (রোপা আমন বীজতলা ও রোপণ)';
+      case 8:
+      case 9:
+        return 'শরৎকাল (আমন ফসলের পরিচর্যা)';
+      case 10:
+      case 11:
+        return 'হেমন্তকাল (আমন ধান কর্তন ও রবি ফসল সূচনা)';
+      case 12:
+      case 1:
+        return 'শীতকাল (বোরো ধানের বীজতলা ও রবি শাকসবজি)';
+      case 2:
+      case 3:
+        return 'বসন্তকাল (বোরো ফসলের বৃদ্ধি ও সেচ)';
+      default:
+        return 'চলতি মৌসুম';
+    }
+  }
+}
