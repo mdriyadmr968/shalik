@@ -19,4 +19,11 @@ export class BanglaFormatters {
       .map(ch => BanglaFormatters.englishToBanglaDigits[ch] || ch)
       .join('');
   }
+
+  public static formatDigits(input: string | number, language: 'bn' | 'en' = 'bn'): string {
+    if (language === 'en') {
+      return String(input);
+    }
+    return BanglaFormatters.toBanglaDigits(input);
+  }
 }

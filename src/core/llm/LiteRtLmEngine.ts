@@ -15,7 +15,7 @@ export interface GenerationParams {
 
 export const DEFAULT_SYSTEM_PROMPT =
   "তুমি 'শালিক' (Shalik) — বাংলাদেশের গ্রামীণ কৃষকদের জন্য একটি অফলাইন কৃষি পরামর্শক এআই। " +
-  'কৃষকদের প্রশ্নের উত্তর সহজ, স্পষ্ট ও ব্যবহারিক বাংলায় দাও। ' +
+  'কৃষকদের প্রশ্নের উত্তর সহজ, স্পষ্ট ও ব্যবহারিক ভাষায় দাও। ' +
   'কীটনাশক বা সার ব্যবহারের ক্ষেত্রে সঠিক অনুমোদিত মাত্রা ও সুরক্ষার নিয়ম (যেমন মাস্ক ব্যবহার) স্পষ্টভাবে উল্লেখ কর। ' +
   'যদি কোনো বিষয়ে নিশ্চিত না হও, তবে ভুল তথ্য না দিয়ে নিকটস্থ উপ-সহকারী কৃষি কর্মকর্তা (SAAO) বা কৃষি কল সেন্টার ১৬১২৩-এ যোগাযোগ করতে বল।';
 
@@ -47,7 +47,6 @@ export class LiteRtLmEngine {
     }
 
     this.engineState = { type: 'Loading' };
-    // Simulate mobile NPU/LiteRT runtime warmup
     this.engineState = { type: 'Ready', modelName };
     return true;
   }
@@ -75,13 +74,46 @@ export class LiteRtLmEngine {
         break;
       }
       yield chunk;
-      // Simulates on-device token streaming (~28 tokens/sec)
       await new Promise(res => setTimeout(res, 25));
     }
   }
 
   private generateMockGroundedResponse(prompt: string): string[] {
     const p = prompt.toLowerCase();
+    const isEnglish = /[a-zA-Z]/.test(prompt) && !/[\u0980-\u09FF]/.test(prompt);
+
+    if (isEnglish) {
+      if (p.includes('blast') || p.includes('brown spot') || p.includes('spot')) {
+        return [
+          'Based on the symptoms, this appears to be Rice Blast or Brown Spot disease.\n\n',
+          'Actionable Steps:\n',
+          '1. Maintain sufficient standing water in the paddy field; do not let it dry out.\n',
+          '2. Suspend excessive top-dressing of urea fertilizer temporarily.\n',
+          '3. Spray Tricyclazole group fungicide (e.g. Trooper/Trico at 0.75g per liter of water).\n\n',
+          '⚠️ Safety note: Wear a face mask while spraying. For further assistance, call Krishi Call Center 16123.'
+        ];
+      } else if (p.includes('urea') || p.includes('fertilizer')) {
+        return [
+          'Recommended Urea Fertilizer Schedule for Boro Rice:\n\n',
+          '1. Apply in three equal split doses:\n',
+          '   - 1st dose: 15-20 days after transplanting.\n',
+          '   - 2nd dose: 35-40 days after transplanting (active tillering).\n',
+          '   - 3rd dose: 5-7 days before panicle initiation.\n',
+          '2. Deep placement of Guti Urea requires only single application and prevents nitrogen loss.\n\n',
+          '⚠️ Ensure shallow standing water when applying urea; avoid excessive flooding.'
+        ];
+      } else {
+        return [
+          'I understand your agricultural inquiry.\n\n',
+          'Initial Guidance:\n',
+          '1. Safely isolate and remove severely diseased plant foliage.\n',
+          '2. Ensure proper field drainage if waterlogged.\n',
+          '3. Apply officially approved agrochemicals in precise doses.\n\n',
+          'Please consult your local Sub-Assistant Agriculture Officer (SAAO) or Krishi Call Center 16123 for specific field diagnoses.'
+        ];
+      }
+    }
+
     if (p.includes('ব্লাস্ট') || (p.includes('ধান') && p.includes('দাগ'))) {
       return [
         'আপনার ধানের লক্ষণ অনুযায়ী এটি ব্লাস্ট বা বাদামী দাগ রোগ হতে পারে।\n\n',

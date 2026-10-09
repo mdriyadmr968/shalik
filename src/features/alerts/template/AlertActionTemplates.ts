@@ -8,6 +8,9 @@ export interface ActionTemplate {
   titleBn: string;
   actionStepsBn: string[];
   urgencyNoteBn: string;
+  titleEn: string;
+  actionStepsEn: string[];
+  urgencyNoteEn: string;
 }
 
 export class AlertActionTemplates {
@@ -24,7 +27,15 @@ export class AlertActionTemplates {
         'বীজ ধান শুকনো পলিথিন বা বায়ুরোধী ড্রামে সিল করে মাচার উপর সংরক্ষণ করুন।',
         'রাসায়নিক সার ও কীটনাশক মাটির সংস্পর্শ থেকে উঁচু মাচায় তুলে রাখুন।'
       ],
-      urgencyNoteBn: 'জরুরি: পানি বৃদ্ধির পূর্বাভাসে নিম্নাঞ্চল প্লাবিত হওয়ার আগেই কর্তন শেষ করুন।'
+      urgencyNoteBn: 'জরুরি: পানি বৃদ্ধির পূর্বাভাসে নিম্নাঞ্চল প্লাবিত হওয়ার আগেই কর্তন শেষ করুন।',
+      titleEn: 'Pre-Flood Rapid Harvest and Grain Protection',
+      actionStepsEn: [
+        'Harvest paddy immediately if 80% matured without waiting for complete ripening.',
+        'Thresh harvested grain quickly and move to elevated roads or high ground for drying.',
+        'Store seed grains in airtight polythene drums on raised bamboo platforms.',
+        'Elevate chemical fertilizers and pesticides above potential flood levels.'
+      ],
+      urgencyNoteEn: 'Urgent: Complete harvest before low-lying river basins are submerged.'
     },
     {
       templateId: 'act_heat_rice_flowering',
@@ -38,7 +49,15 @@ export class AlertActionTemplates {
         'প্রয়োজনে পড়ন্ত বিকেলে বা ভোরে সেচ দিন যাতে মাটির তাপমাত্রা সহনশীল থাকে।',
         'বোরো ধানে পটাশ সারের হালকা স্প্রে (প্রতি লিটারে ১০ গ্রাম এমওপি) তাপ সহনশীলতা বাড়ায়।'
       ],
-      urgencyNoteBn: 'সতর্কতা: তাপমাত্রা ৩৫° সেলসিয়াস অতিক্রম করলে ফুল পরাগায়ন ব্যাহত হয়ে চিটা হতে পারে।'
+      urgencyNoteBn: 'সতর্কতা: তাপমাত্রা ৩৫° সেলসিয়াস অতিক্রম করলে ফুল পরাগায়ন ব্যাহত হয়ে চিটা হতে পারে।',
+      titleEn: 'Irrigation Management to Prevent Chaffing in Extreme Heat',
+      actionStepsEn: [
+        'Maintain constant standing water of 5 to 7 cm across the paddy field.',
+        'Avoid spraying pesticides or fertilizers during peak sun between 10 AM and 3 PM.',
+        'Irrigate in late afternoon or early dawn to regulate soil and root temperature.',
+        'Light spray of Potash fertilizer (10g MOP per liter of water) enhances heat tolerance.'
+      ],
+      urgencyNoteEn: 'Warning: Temperatures exceeding 35°C severely impede flower pollination.'
     },
     {
       templateId: 'act_heavy_rain_drainage',
@@ -51,7 +70,14 @@ export class AlertActionTemplates {
         'আলু ও শাকসবজির জমিতে পানি জমতে দেওয়া যাবে না, জমলে পচন রোগ দ্রুত ছড়িয়ে পড়ে।',
         'বৃষ্টির আগে কোনো ধরনের স্প্রে বা উপরি-প্রয়োগ সার দেবেন না, ধুয়ে অপচয় হবে।'
       ],
-      urgencyNoteBn: 'দ্রুত নালা কেটে জমে থাকা পানি পাশের খালে নামিয়ে দিন।'
+      urgencyNoteBn: 'দ্রুত নালা কেটে জমে থাকা পানি পাশের খালে নামিয়ে দিন।',
+      titleEn: 'Field Drainage & Canal Clearing for Heavy Downpours',
+      actionStepsEn: [
+        'Deepen and clear field boundary drainage ditches to prevent standing water.',
+        'Do not allow stagnant water in potato and vegetable beds to prevent collar rot.',
+        'Avoid chemical sprays or top-dressing fertilizers prior to rainfall.'
+      ],
+      urgencyNoteEn: 'Quickly cut trenches to release trapped water into local canals.'
     },
     {
       templateId: 'act_cyclone_harvest',
@@ -64,7 +90,14 @@ export class AlertActionTemplates {
         'কলা বাগান, পেঁপে গাছ বা বেড়া দেওয়া ফসলে শক্ত বাঁশের খুঁটি দিয়ে বেঁধে দিন।',
         'গবাদি পশু ও হাঁস-মুরগি নিকটস্থ সাইক্লোন শেল্টারে বা উঁচু পাকা ভিটায় স্থানান্তর করুন।'
       ],
-      urgencyNoteBn: 'বাতাস তীব্র হওয়ার আগেই মাঠের কাজ গুটিয়ে নিরাপদ আশ্রয়ে যান।'
+      urgencyNoteBn: 'বাতাস তীব্র হওয়ার আগেই মাঠের কাজ গুটিয়ে নিরাপদ আশ্রয়ে যান।',
+      titleEn: 'Pre-Cyclone Crop & Farm Protection',
+      actionStepsEn: [
+        'Harvest and bring all mature fruits, crops, and vegetables indoors immediately.',
+        'Tie banana trees, papaya stems, and trellis crops with sturdy bamboo supports.',
+        'Relocate cattle and poultry to local cyclone shelters or elevated paved yards.'
+      ],
+      urgencyNoteEn: 'Wrap up field operations and take shelter before wind speeds intensify.'
     },
     {
       templateId: 'act_cold_potato_blight',
@@ -77,13 +110,24 @@ export class AlertActionTemplates {
         'লক্ষণ প্রকাশের আগেই সতর্কতামূলক মেনকোজেব গ্রুপের ছত্রাকনাশক (যেমন ডাইথেন এম-৪৫ প্রতি লিটারে ২ গ্রাম) কুয়াশা কাটার পর স্প্রে করুন।',
         'আক্রান্ত গাছ দেখা মাত্রই উপড়ে ফেলে মাটির নিচে পুঁতে ফেলুন।'
       ],
-      urgencyNoteBn: 'কুয়াশা ভেজা পাতায় ছত্রাক দ্রুত ছড়ায়, পাতা শুকনা অবস্থায় স্প্রে করুন।'
+      urgencyNoteBn: 'কুয়াশা ভেজা পাতায় ছত্রাক দ্রুত ছড়ায়, পাতা শুকনা অবস্থায় স্প্রে করুন।',
+      titleEn: 'Potato Late Blight Prevention during Dense Fog & Cold Waves',
+      actionStepsEn: [
+        'Temporarily suspend irrigation during continuous heavy fog and overcast skies.',
+        'Apply preventive Mancozeb spray (e.g. Dithane M-45, 2g/L) once fog clears in daytime.',
+        'Immediately uproot and bury any infected plants showing late blight lesions.'
+      ],
+      urgencyNoteEn: 'Fungus spreads rapidly on wet foliage; only spray when leaves are dry.'
     }
   ];
 
   public static getTemplatesForAlert(alertType: AlertType, crop: string = 'ধান'): ActionTemplate[] {
     const matched = AlertActionTemplates.templates.filter(
-      t => t.alertType === alertType && (t.targetCrop.includes(crop) || t.targetCrop === 'সকল ফসল')
+      t =>
+        t.alertType === alertType &&
+        (t.targetCrop.includes(crop) ||
+          t.targetCrop === 'সকল ফসল' ||
+          t.targetCrop === 'All Crops')
     );
     if (matched.length > 0) return matched;
     return AlertActionTemplates.templates.filter(t => t.alertType === alertType);

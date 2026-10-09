@@ -14,6 +14,8 @@ import { AssistantViewModel, AssistantUiState } from '../viewmodel/AssistantView
 import { ChatMessage, MessageSender } from '../../../core/data/models/ChatMessage';
 import { BanglaFormatters } from '../util/BanglaFormatters';
 import { Colors } from '../../../theme/colors';
+import { LanguageManager } from '../../../i18n/LanguageManager';
+import { Language } from '../../../i18n/translations';
 
 interface AssistantScreenProps {
   viewModel: AssistantViewModel;
@@ -23,16 +25,27 @@ export const AssistantScreen: React.FC<AssistantScreenProps> = ({ viewModel }) =
   const [uiState, setUiState] = useState<AssistantUiState>(viewModel.getState());
   const [inputText, setInputText] = useState('');
   const [transcriptInput, setTranscriptInput] = useState('');
+  const [lang, setLang] = useState<Language>(LanguageManager.getInstance().getLanguage());
   const scrollViewRef = useRef<ScrollView>(null);
 
+  const t = LanguageManager.getInstance().getTranslations();
+
   useEffect(() => {
-    const unsubscribe = viewModel.subscribe(newState => {
+    const unsubVm = viewModel.subscribe(newState => {
       setUiState(newState);
       if (newState.pendingVoiceTranscript) {
         setTranscriptInput(newState.pendingVoiceTranscript);
       }
     });
-    return unsubscribe;
+
+    const unsubLang = LanguageManager.getInstance().subscribe(newLang => {
+      setLang(newLang);
+    });
+
+    return () => {
+      unsubVm();
+      unsubLang();
+    };
   }, [viewModel]);
 
   useEffect(() => {
@@ -67,32 +80,46 @@ export const AssistantScreen: React.FC<AssistantScreenProps> = ({ viewModel }) =
       {/* Top Bar */}
       <View style={styles.topBar}>
         <View style={styles.topBarContent}>
-          <Text style={styles.appTitle}>শালিক (Shalik)</Text>
-          <Text style={styles.appSubtitle}>ইন্টারনেট ছাড়াই কণ্ঠ ও চোখের কৃষি সহকারী</Text>
+          <Text style={styles.appTitle}>{t.appTitle}</Text>
+          <Text style={styles.appSubtitle}>{t.appSubtitle}</Text>
         </View>
-        <TouchableOpacity
-          style={styles.newChatBtn}
-          onPress={() => viewModel.startNewConversation()}
-        >
-          <Text style={styles.newChatBtnText}>+ নতুন</Text>
-        </TouchableOpacity>
+
+        <View style={styles.topBarActions}>
+          {/* Language Toggle Button */}
+          <TouchableOpacity
+            style={styles.langToggleBtn}
+            onPress={() => LanguageManager.getInstance().toggleLanguage()}
+          >
+            <Text style={styles.langToggleText}>
+              {lang === 'bn' ? 'বাংলা | EN' : 'EN | বাংলা'}
+            </Text>
+          </TouchableOpacity>
+
+          {/* New Chat Button */}
+          <TouchableOpacity
+            style={styles.newChatBtn}
+            onPress={() => viewModel.startNewConversation()}
+          >
+            <Text style={styles.newChatBtnText}>{t.newChat}</Text>
+          </TouchableOpacity>
+        </View>
       </View>
 
       {/* Offline Status Banner */}
       <View style={styles.statusBanner}>
-        <Text style={styles.statusText}>🟢 সম্পূর্ণ অফলাইন মোড সক্রিয়</Text>
-        <Text style={styles.hotlineText}>জরুরিতে: ১৬১২৩</Text>
+        <Text style={styles.statusText}>{t.offlineActive}</Text>
+        <Text style={styles.hotlineText}>{t.emergencyHotline}</Text>
       </View>
 
       {/* Attached Image Notice */}
       {uiState.attachedImageUri && (
         <View style={styles.imageNoticeBanner}>
-          <Text style={styles.imageNoticeText}>📷 পাতার ছবি সংযুক্ত করা হয়েছে</Text>
+          <Text style={styles.imageNoticeText}>{t.imageAttached}</Text>
           {uiState.imageQualityWarning && (
             <Text style={styles.imageWarningText}>⚠️ {uiState.imageQualityWarning}</Text>
           )}
           <TouchableOpacity onPress={() => viewModel.removeAttachedImage()}>
-            <Text style={styles.removeImageText}>✕ মুছুন</Text>
+            <Text style={styles.removeImageText}>{t.removeImage}</Text>
           </TouchableOpacity>
         </View>
       )}
@@ -106,13 +133,8 @@ export const AssistantScreen: React.FC<AssistantScreenProps> = ({ viewModel }) =
         {/* Empty State Suggestions */}
         {uiState.messages.length === 0 && !uiState.streamingText && (
           <View style={styles.suggestionsContainer}>
-            <Text style={styles.suggestionsHeader}>কৃষকদের সাধারণ প্রশ্নসমূহ:</Text>
-            {[
-              'ধানের পাতায় বাদামী দাগ পড়েছে, কি করব?',
-              'বোরো ধানে ইউরিয়া সার দেওয়ার সঠিক নিয়ম কি?',
-              'আলুর নাবি ধসা রোগের লক্ষণ ও প্রতিকার কি?',
-              'বেগুনের ডগা ও ফল ছিদ্রকারী পোকা কিভাবে দমন করব?'
-            ].map((s, idx) => (
+            <Text style={styles.suggestionsHeader}>{t.quickQuestionsHeader}</Text>
+            {t.suggestions.map((s, idx) => (
               <TouchableOpacity
                 key={idx}
                 style={styles.suggestionCard}
@@ -141,13 +163,13 @@ export const AssistantScreen: React.FC<AssistantScreenProps> = ({ viewModel }) =
             >
               {msg.sender === MessageSender.SHALIK && (
                 <View style={styles.shalikHeaderRow}>
-                  <Text style={styles.shalikSenderLabel}>শালিকের পরামর্শ</Text>
+                  <Text style={styles.shalikSenderLabel}>{t.shalikAdvice}</Text>
                   <TouchableOpacity
                     style={styles.audioPlayBtn}
                     onPress={() => viewModel.playMessageAudio(msg.text)}
                   >
                     <Text style={styles.audioPlayBtnText}>
-                      {uiState.ttsState.type === 'Speaking' ? '🔊 শুনছেন...' : '🔊 শুনুন'}
+                      {uiState.ttsState.type === 'Speaking' ? t.listening : t.listen}
                     </Text>
                   </TouchableOpacity>
                 </View>
@@ -165,7 +187,8 @@ export const AssistantScreen: React.FC<AssistantScreenProps> = ({ viewModel }) =
               {msg.sender === MessageSender.SHALIK && msg.citedSources.length > 0 && (
                 <View style={styles.citationsContainer}>
                   <Text style={styles.citationsText}>
-                    📚 সূত্র: {msg.citedSources.join(', ')}
+                    {t.sourcesPrefix}
+                    {msg.citedSources.join(', ')}
                   </Text>
                 </View>
               )}
@@ -178,7 +201,7 @@ export const AssistantScreen: React.FC<AssistantScreenProps> = ({ viewModel }) =
           <View style={[styles.messageRow, styles.shalikRow]}>
             <View style={[styles.bubble, styles.shalikBubble]}>
               <View style={styles.streamingHeaderRow}>
-                <Text style={styles.shalikSenderLabel}>শালিক লিখছে...</Text>
+                <Text style={styles.shalikSenderLabel}>{t.shalikWriting}</Text>
                 <ActivityIndicator size="small" color={Colors.agriculturalGreen} />
               </View>
               <Text style={[styles.messageText, styles.shalikText]}>
@@ -193,11 +216,12 @@ export const AssistantScreen: React.FC<AssistantScreenProps> = ({ viewModel }) =
       {uiState.recordingState.type === 'Recording' && (
         <View style={styles.recordingBanner}>
           <Text style={styles.recordingText}>
-            🔴 কথা শুনছি...{' '}
-            {BanglaFormatters.toBanglaDigits(
-              Math.floor(uiState.recordingState.durationMs / 1000)
+            {t.listeningVoice}{' '}
+            {BanglaFormatters.formatDigits(
+              Math.floor(uiState.recordingState.durationMs / 1000),
+              lang
             )}{' '}
-            সেকেন্ড
+            {t.seconds}
           </Text>
         </View>
       )}
@@ -234,7 +258,7 @@ export const AssistantScreen: React.FC<AssistantScreenProps> = ({ viewModel }) =
 
         <TextInput
           style={styles.textInput}
-          placeholder="ফসলের সমস্যা লিখুন..."
+          placeholder={t.inputPlaceholder}
           placeholderTextColor={Colors.textMuted}
           value={inputText}
           onChangeText={setInputText}
@@ -270,28 +294,26 @@ export const AssistantScreen: React.FC<AssistantScreenProps> = ({ viewModel }) =
       >
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>আপনার মুখের কথা শোনা হয়েছে:</Text>
+            <Text style={styles.modalTitle}>{t.voiceDialogTitle}</Text>
             <TextInput
               style={styles.modalInput}
               value={transcriptInput}
               onChangeText={setTranscriptInput}
               multiline
             />
-            <Text style={styles.modalHint}>
-              দরকার হলে লেখাটি পরিবর্তন করে নিশ্চিত করুন।
-            </Text>
+            <Text style={styles.modalHint}>{t.voiceDialogHint}</Text>
             <View style={styles.modalButtonRow}>
               <TouchableOpacity
                 style={styles.modalCancelBtn}
                 onPress={() => viewModel.dismissVoiceTranscript()}
               >
-                <Text style={styles.modalCancelText}>বাতিল</Text>
+                <Text style={styles.modalCancelText}>{t.cancel}</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 style={styles.modalConfirmBtn}
                 onPress={() => viewModel.confirmVoiceTranscript(transcriptInput)}
               >
-                <Text style={styles.modalConfirmText}>নিশ্চিত ও প্রেরণ</Text>
+                <Text style={styles.modalConfirmText}>{t.confirmAndSend}</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -312,31 +334,49 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     backgroundColor: Colors.agriculturalGreen,
     paddingHorizontal: 16,
-    paddingVertical: 12
+    paddingVertical: 10
   },
   topBarContent: {
     flex: 1
   },
+  topBarActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8
+  },
+  langToggleBtn: {
+    backgroundColor: '#FFFFFF',
+    paddingHorizontal: 8,
+    paddingVertical: 5,
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: Colors.agriculturalGreenSoft
+  },
+  langToggleText: {
+    color: Colors.agriculturalGreen,
+    fontWeight: 'bold',
+    fontSize: 11
+  },
   appTitle: {
     color: '#FFFFFF',
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: 'bold'
   },
   appSubtitle: {
     color: Colors.agriculturalGreenSoft,
-    fontSize: 12,
-    marginTop: 2
+    fontSize: 11,
+    marginTop: 1
   },
   newChatBtn: {
     backgroundColor: 'rgba(255,255,255,0.2)',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 16
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 14
   },
   newChatBtnText: {
     color: '#FFFFFF',
     fontWeight: 'bold',
-    fontSize: 13
+    fontSize: 12
   },
   statusBanner: {
     flexDirection: 'row',

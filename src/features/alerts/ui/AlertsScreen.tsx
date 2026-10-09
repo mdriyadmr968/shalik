@@ -11,6 +11,8 @@ import {
 import { AlertsViewModel, AlertsUiState } from '../viewmodel/AlertsViewModel';
 import { ShalikAlert, AlertType } from '../../../core/data/models/Alert';
 import { Colors } from '../../../theme/colors';
+import { LanguageManager } from '../../../i18n/LanguageManager';
+import { Language } from '../../../i18n/translations';
 
 interface AlertsScreenProps {
   viewModel: AlertsViewModel;
@@ -18,12 +20,22 @@ interface AlertsScreenProps {
 
 export const AlertsScreen: React.FC<AlertsScreenProps> = ({ viewModel }) => {
   const [uiState, setUiState] = useState<AlertsUiState>(viewModel.getState());
+  const [lang, setLang] = useState<Language>(LanguageManager.getInstance().getLanguage());
+
+  const t = LanguageManager.getInstance().getTranslations();
 
   useEffect(() => {
-    const unsubscribe = viewModel.subscribe(newState => {
+    const unsubVm = viewModel.subscribe(newState => {
       setUiState(newState);
     });
-    return unsubscribe;
+    const unsubLang = LanguageManager.getInstance().subscribe(newLang => {
+      setLang(newLang);
+    });
+
+    return () => {
+      unsubVm();
+      unsubLang();
+    };
   }, [viewModel]);
 
   const getTypeIcon = (type: AlertType) => {
@@ -65,12 +77,48 @@ export const AlertsScreen: React.FC<AlertsScreenProps> = ({ viewModel }) => {
     }
   };
 
+  const getSeverityLabel = (alert: ShalikAlert) => {
+    if (lang === 'en') {
+      switch (alert.severity.level) {
+        case 4:
+          return 'Emergency';
+        case 3:
+          return 'Warning';
+        case 2:
+          return 'Watch';
+        case 1:
+        default:
+          return 'Advisory';
+      }
+    }
+    return alert.severity.labelBn;
+  };
+
+  const getAlertMessage = (alert: ShalikAlert) => {
+    if (lang === 'en' && alert.messageEn) {
+      return alert.messageEn;
+    }
+    return alert.messageBn;
+  };
+
   return (
     <SafeAreaView style={styles.safeArea}>
       {/* Top Header */}
       <View style={styles.topBar}>
-        <Text style={styles.topBarTitle}>দুর্যোগ ও কৃষি আবহাওয়া</Text>
-        <Text style={styles.topBarSubtitle}>বন্যা, খরা ও তাপদাহ পূর্বাভাস</Text>
+        <View style={styles.topBarContent}>
+          <Text style={styles.topBarTitle}>{t.alertsTitle}</Text>
+          <Text style={styles.topBarSubtitle}>{t.alertsSubtitle}</Text>
+        </View>
+
+        {/* Language Toggle Button */}
+        <TouchableOpacity
+          style={styles.langToggleBtn}
+          onPress={() => LanguageManager.getInstance().toggleLanguage()}
+        >
+          <Text style={styles.langToggleText}>
+            {lang === 'bn' ? 'বাংলা | EN' : 'EN | বাংলা'}
+          </Text>
+        </TouchableOpacity>
       </View>
 
       {/* Main Content */}
@@ -78,12 +126,14 @@ export const AlertsScreen: React.FC<AlertsScreenProps> = ({ viewModel }) => {
         {uiState.alerts.length === 0 ? (
           <View style={styles.emptyContainer}>
             <Text style={styles.emptyIcon}>✓</Text>
-            <Text style={styles.emptyTitle}>কোনো সক্রিয় বিপদ সংকেত নেই</Text>
-            <Text style={styles.emptySubtitle}>আপনার এলাকার আবহাওয়া স্বাভাবিক আছে।</Text>
+            <Text style={styles.emptyTitle}>{t.noAlertsTitle}</Text>
+            <Text style={styles.emptySubtitle}>{t.noAlertsSubtitle}</Text>
           </View>
         ) : (
           uiState.alerts.map(alert => {
             const colors = getSeverityColors(alert.severity.level);
+            const message = getAlertMessage(alert);
+
             return (
               <TouchableOpacity
                 key={alert.id}
@@ -98,27 +148,30 @@ export const AlertsScreen: React.FC<AlertsScreenProps> = ({ viewModel }) => {
                   <View style={styles.typeRow}>
                     <Text style={styles.typeIconText}>{getTypeIcon(alert.type)}</Text>
                     <View style={[styles.badge, { backgroundColor: colors.badge }]}>
-                      <Text style={styles.badgeText}>{alert.severity.labelBn}</Text>
+                      <Text style={styles.badgeText}>{getSeverityLabel(alert)}</Text>
                     </View>
                   </View>
                   <TouchableOpacity
                     style={styles.audioBtn}
-                    onPress={() => viewModel.playAlertAudio(alert.messageBn)}
+                    onPress={() => viewModel.playAlertAudio(message)}
                   >
                     <Text style={[styles.audioBtnText, { color: colors.badge }]}>
-                      🔊 বার্তা শুনুন
+                      {t.listenAlert}
                     </Text>
                   </TouchableOpacity>
                 </View>
 
                 {/* Message */}
-                <Text style={styles.alertMessage}>{alert.messageBn}</Text>
+                <Text style={styles.alertMessage}>{message}</Text>
 
                 {/* Footer row */}
                 <View style={styles.cardFooterRow}>
-                  <Text style={styles.sourceText}>উৎস: {alert.source}</Text>
+                  <Text style={styles.sourceText}>
+                    {t.sourcePrefix}
+                    {alert.source}
+                  </Text>
                   <Text style={[styles.ctaText, { color: colors.badge }]}>
-                    করণীয় দেখতে স্পর্শ করুন ➔
+                    {t.viewActionSteps}
                   </Text>
                 </View>
               </TouchableOpacity>
@@ -138,37 +191,43 @@ export const AlertsScreen: React.FC<AlertsScreenProps> = ({ viewModel }) => {
             <ScrollView style={styles.modalScroll}>
               <View style={styles.modalHeaderRow}>
                 <Text style={styles.modalWarningIcon}>⚠️</Text>
-                <Text style={styles.modalTitle}>জরুরি করণীয় নির্দেশনা</Text>
+                <Text style={styles.modalTitle}>{t.modalAlertTitle}</Text>
               </View>
 
               {uiState.selectedAlert && (
                 <Text style={styles.modalAlertMessage}>
-                  {uiState.selectedAlert.messageBn}
+                  {getAlertMessage(uiState.selectedAlert)}
                 </Text>
               )}
 
               <View style={styles.modalDivider} />
 
-              <Text style={styles.modalStepsHeader}>কৃষি বিশেষজ্ঞের পদক্ষেপসমূহ:</Text>
+              <Text style={styles.modalStepsHeader}>{t.expertStepsHeader}</Text>
 
-              {uiState.selectedTemplates.map((template, tIdx) => (
-                <View key={tIdx} style={styles.templateSection}>
-                  <Text style={styles.templateTitle}>📌 {template.titleBn}</Text>
-                  {template.actionStepsBn.map((step, sIdx) => (
-                    <Text key={sIdx} style={styles.templateStep}>
-                      {sIdx + 1}. {step}
-                    </Text>
-                  ))}
-                  <Text style={styles.urgencyNote}>⚠️ {template.urgencyNoteBn}</Text>
-                </View>
-              ))}
+              {uiState.selectedTemplates.map((template, tIdx) => {
+                const title = lang === 'en' ? template.titleEn : template.titleBn;
+                const steps = lang === 'en' ? template.actionStepsEn : template.actionStepsBn;
+                const urgency = lang === 'en' ? template.urgencyNoteEn : template.urgencyNoteBn;
+
+                return (
+                  <View key={tIdx} style={styles.templateSection}>
+                    <Text style={styles.templateTitle}>📌 {title}</Text>
+                    {steps.map((step, sIdx) => (
+                      <Text key={sIdx} style={styles.templateStep}>
+                        {sIdx + 1}. {step}
+                      </Text>
+                    ))}
+                    <Text style={styles.urgencyNote}>⚠️ {urgency}</Text>
+                  </View>
+                );
+              })}
             </ScrollView>
 
             <TouchableOpacity
               style={styles.modalCloseBtn}
               onPress={() => viewModel.dismissDetail()}
             >
-              <Text style={styles.modalCloseText}>বুঝেছি</Text>
+              <Text style={styles.modalCloseText}>{t.understood}</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -183,11 +242,17 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.background
   },
   topBar: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
     backgroundColor: Colors.alertAdvisoryBg,
     paddingHorizontal: 16,
-    paddingVertical: 14,
+    paddingVertical: 12,
     borderBottomWidth: 1,
     borderBottomColor: '#C8E6C9'
+  },
+  topBarContent: {
+    flex: 1
   },
   topBarTitle: {
     fontSize: 18,
@@ -198,6 +263,19 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: Colors.textSecondary,
     marginTop: 2
+  },
+  langToggleBtn: {
+    backgroundColor: '#FFFFFF',
+    paddingHorizontal: 8,
+    paddingVertical: 5,
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: '#A5D6A7'
+  },
+  langToggleText: {
+    color: Colors.agriculturalGreen,
+    fontWeight: 'bold',
+    fontSize: 11
   },
   container: {
     flex: 1

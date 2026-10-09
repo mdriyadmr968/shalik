@@ -279,16 +279,20 @@ export class AssistantViewModel {
         }
       }
 
+      // Language context
+      const currentLang = (await this.profileRepository.getFarmerProfile()).preferredLanguage === 'en' ? 'en' : 'bn';
+
       // Build Prompt
       const prompt = this.promptBuilder.buildPrompt({
         farmerQuestion: trimmed,
         cropName: primaryCrop,
         district,
         hasImageAttached: attachedImg !== null,
-        classifierTopLabel: attachedImg ? 'ব্লাস্ট রোগ' : null,
+        classifierTopLabel: attachedImg ? (currentLang === 'en' ? 'Rice Blast' : 'ব্লাস্ট রোগ') : null,
         classifierConfidence: attachedImg ? 0.92 : null,
         activeWeatherAlert,
-        retrievedKnowledgePassages: passages
+        retrievedKnowledgePassages: passages,
+        language: currentLang
       });
 
       let fullRawResponse = '';
@@ -313,7 +317,8 @@ export class AssistantViewModel {
       // M5: Pesticide Safety Guard Check
       const safetyCheck = this.pesticideSafetyGuard.validateAndSanitize(
         fullRawResponse,
-        0.92
+        0.92,
+        currentLang
       );
       const sanitizedResponse = safetyCheck.sanitizedResponse;
 

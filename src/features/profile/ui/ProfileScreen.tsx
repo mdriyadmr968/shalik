@@ -6,12 +6,13 @@ import {
   TouchableOpacity,
   ScrollView,
   StyleSheet,
-  SafeAreaView,
-  Alert
+  SafeAreaView
 } from 'react-native';
 import { FarmerProfileRepository } from '../../../core/data/repository/FarmerProfileRepository';
 import { FarmerProfile } from '../../../core/data/models/FarmerProfile';
 import { Colors } from '../../../theme/colors';
+import { LanguageManager } from '../../../i18n/LanguageManager';
+import { Language } from '../../../i18n/translations';
 
 interface ProfileScreenProps {
   repository?: FarmerProfileRepository;
@@ -34,7 +35,10 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
   const [district, setDistrict] = useState(profile.district);
   const [upazila, setUpazila] = useState(profile.upazila);
   const [cropsText, setCropsText] = useState(profile.primaryCrops.join(', '));
+  const [lang, setLang] = useState<Language>(LanguageManager.getInstance().getLanguage());
   const [savedSuccess, setSavedSuccess] = useState(false);
+
+  const t = LanguageManager.getInstance().getTranslations();
 
   useEffect(() => {
     repository.getFarmerProfile().then(p => {
@@ -44,7 +48,18 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
       setUpazila(p.upazila);
       setCropsText(p.primaryCrops.join(', '));
     });
+
+    const unsubLang = LanguageManager.getInstance().subscribe(newLang => {
+      setLang(newLang);
+    });
+
+    return () => unsubLang();
   }, [repository]);
+
+  const handleLanguageChange = async (selectedLang: Language) => {
+    await LanguageManager.getInstance().setLanguage(selectedLang);
+    setProfile(prev => ({ ...prev, preferredLanguage: selectedLang }));
+  };
 
   const handleSave = async () => {
     const crops = cropsText
@@ -57,7 +72,8 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
       farmerName,
       district,
       upazila,
-      primaryCrops: crops
+      primaryCrops: crops,
+      preferredLanguage: lang
     };
 
     await repository.saveProfile(updated);
@@ -69,60 +85,108 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.topBar}>
-        <Text style={styles.topBarTitle}>কৃষক প্রোফাইল ও সেটিংস</Text>
-        <Text style={styles.topBarSubtitle}>ব্যক্তিগত তথ্য ও ফসলের বিবরণ</Text>
+        <View style={styles.topBarContent}>
+          <Text style={styles.topBarTitle}>{t.profileTitle}</Text>
+          <Text style={styles.topBarSubtitle}>{t.profileSubtitle}</Text>
+        </View>
+
+        {/* Quick Toggle Button */}
+        <TouchableOpacity
+          style={styles.langToggleBtn}
+          onPress={() => LanguageManager.getInstance().toggleLanguage()}
+        >
+          <Text style={styles.langToggleText}>
+            {lang === 'bn' ? 'বাংলা | EN' : 'EN | বাংলা'}
+          </Text>
+        </TouchableOpacity>
       </View>
 
       <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
         <View style={styles.card}>
-          <Text style={styles.label}>কৃষকের নাম:</Text>
+          {/* Language Selector Section */}
+          <Text style={styles.label}>{t.languageSelectLabel}</Text>
+          <View style={styles.langChoiceRow}>
+            <TouchableOpacity
+              style={[
+                styles.langChoiceBtn,
+                lang === 'bn' && styles.langChoiceBtnActive
+              ]}
+              onPress={() => handleLanguageChange('bn')}
+            >
+              <Text
+                style={[
+                  styles.langChoiceText,
+                  lang === 'bn' && styles.langChoiceTextActive
+                ]}
+              >
+                🇧🇩 বাংলা (Bengali)
+              </Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[
+                styles.langChoiceBtn,
+                lang === 'en' && styles.langChoiceBtnActive
+              ]}
+              onPress={() => handleLanguageChange('en')}
+            >
+              <Text
+                style={[
+                  styles.langChoiceText,
+                  lang === 'en' && styles.langChoiceTextActive
+                ]}
+              >
+                🌐 English
+              </Text>
+            </TouchableOpacity>
+          </View>
+
+          <Text style={styles.label}>{t.farmerNameLabel}</Text>
           <TextInput
             style={styles.input}
             value={farmerName}
             onChangeText={setFarmerName}
-            placeholder="আপনার নাম লিখুন"
+            placeholder={lang === 'en' ? 'Enter farmer name' : 'আপনার নাম লিখুন'}
           />
 
-          <Text style={styles.label}>জেলা:</Text>
+          <Text style={styles.label}>{t.districtLabel}</Text>
           <TextInput
             style={styles.input}
             value={district}
             onChangeText={setDistrict}
-            placeholder="যেমন: কুড়িগ্রাম, রাজশাহী"
+            placeholder={lang === 'en' ? 'e.g. Kurigram, Rajshahi' : 'যেমন: কুড়িগ্রাম, রাজশাহী'}
           />
 
-          <Text style={styles.label}>উপজেলা:</Text>
+          <Text style={styles.label}>{t.upazilaLabel}</Text>
           <TextInput
             style={styles.input}
             value={upazila}
             onChangeText={setUpazila}
-            placeholder="যেমন: চিলমারী, উলিপুর"
+            placeholder={lang === 'en' ? 'e.g. Chilmari, Ulipur' : 'যেমন: চিলমারী, উলিপুর'}
           />
 
-          <Text style={styles.label}>প্রধান ফসলসমূহ (কমা দিয়ে আলাদা করুন):</Text>
+          <Text style={styles.label}>{t.primaryCropsLabel}</Text>
           <TextInput
             style={styles.input}
             value={cropsText}
             onChangeText={setCropsText}
-            placeholder="ধান, গম, আলু, ভুট্টা"
+            placeholder={lang === 'en' ? 'Rice, Wheat, Potato, Maize' : 'ধান, গম, আলু, ভুট্টা'}
           />
 
           {savedSuccess && (
             <View style={styles.successBanner}>
-              <Text style={styles.successText}>✓ প্রোফাইল সফলভাবে সংরক্ষিত হয়েছে!</Text>
+              <Text style={styles.successText}>{t.savedSuccess}</Text>
             </View>
           )}
 
           <TouchableOpacity style={styles.saveBtn} onPress={handleSave}>
-            <Text style={styles.saveBtnText}>সংরক্ষণ করুন</Text>
+            <Text style={styles.saveBtnText}>{t.saveButton}</Text>
           </TouchableOpacity>
         </View>
 
         <View style={styles.infoCard}>
-          <Text style={styles.infoTitle}>🔒 সম্পূর্ণ অফলাইন ও নিরাপদ</Text>
-          <Text style={styles.infoDesc}>
-            শালিক-এ আপনার কোনো তথ্য ক্লাউড বা ইন্টারনেটে পাঠানো হয় না। আপনার সমস্ত তথ্য এই ফোনে সুরক্ষিতভাবে সংরক্ষিত থাকে।
-          </Text>
+          <Text style={styles.infoTitle}>{t.offlineSecurityTitle}</Text>
+          <Text style={styles.infoDesc}>{t.offlineSecurityDesc}</Text>
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -135,9 +199,15 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.background
   },
   topBar: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
     backgroundColor: Colors.soilBrown,
     paddingHorizontal: 16,
-    paddingVertical: 14
+    paddingVertical: 12
+  },
+  topBarContent: {
+    flex: 1
   },
   topBarTitle: {
     fontSize: 18,
@@ -148,6 +218,17 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#D7CCC8',
     marginTop: 2
+  },
+  langToggleBtn: {
+    backgroundColor: '#FFFFFF',
+    paddingHorizontal: 8,
+    paddingVertical: 5,
+    borderRadius: 14
+  },
+  langToggleText: {
+    color: Colors.soilBrown,
+    fontWeight: 'bold',
+    fontSize: 11
   },
   container: {
     flex: 1
@@ -170,6 +251,34 @@ const styles = StyleSheet.create({
     color: Colors.soilBrown,
     marginBottom: 4,
     marginTop: 10
+  },
+  langChoiceRow: {
+    flexDirection: 'row',
+    gap: 10,
+    marginTop: 4,
+    marginBottom: 6
+  },
+  langChoiceBtn: {
+    flex: 1,
+    paddingVertical: 10,
+    borderRadius: 8,
+    borderWidth: 1.5,
+    borderColor: '#DDDDDD',
+    alignItems: 'center',
+    backgroundColor: '#FAFAFA'
+  },
+  langChoiceBtnActive: {
+    borderColor: Colors.agriculturalGreen,
+    backgroundColor: '#E8F5E9'
+  },
+  langChoiceText: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: '#666666'
+  },
+  langChoiceTextActive: {
+    color: Colors.agriculturalGreen,
+    fontWeight: 'bold'
   },
   input: {
     borderWidth: 1,

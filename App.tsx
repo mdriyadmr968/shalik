@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, StatusBar } from 'react-native';
 import { AssistantScreen } from './src/features/assistant/ui/AssistantScreen';
 import { AlertsScreen } from './src/features/alerts/ui/AlertsScreen';
@@ -6,14 +6,26 @@ import { ProfileScreen } from './src/features/profile/ui/ProfileScreen';
 import { AssistantViewModel } from './src/features/assistant/viewmodel/AssistantViewModel';
 import { AlertsViewModel } from './src/features/alerts/viewmodel/AlertsViewModel';
 import { Colors } from './src/theme/colors';
+import { LanguageManager } from './src/i18n/LanguageManager';
+import { Language } from './src/i18n/translations';
 
 type Tab = 'assistant' | 'alerts' | 'profile';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState<Tab>('assistant');
+  const [lang, setLang] = useState<Language>(LanguageManager.getInstance().getLanguage());
 
   const assistantVm = useMemo(() => new AssistantViewModel(), []);
   const alertsVm = useMemo(() => new AlertsViewModel(), []);
+
+  useEffect(() => {
+    const unsub = LanguageManager.getInstance().subscribe(newLang => {
+      setLang(newLang);
+    });
+    return () => unsub();
+  }, []);
+
+  const t = LanguageManager.getInstance().getTranslations();
 
   return (
     <View style={styles.container}>
@@ -38,7 +50,7 @@ export default function App() {
               activeTab === 'assistant' && styles.tabLabelActive
             ]}
           >
-            পরামর্শ
+            {t.tabAssistant}
           </Text>
         </TouchableOpacity>
 
@@ -53,7 +65,7 @@ export default function App() {
               activeTab === 'alerts' && styles.tabLabelActive
             ]}
           >
-            দুর্যোগ ও আবহাওয়া
+            {t.tabAlerts}
           </Text>
         </TouchableOpacity>
 
@@ -68,7 +80,7 @@ export default function App() {
               activeTab === 'profile' && styles.tabLabelActive
             ]}
           >
-            প্রোফাইল
+            {t.tabProfile}
           </Text>
         </TouchableOpacity>
       </View>
