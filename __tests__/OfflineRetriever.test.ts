@@ -34,4 +34,12 @@ describe('OfflineRetriever', () => {
     const results = await retriever.retrieveRelevantPassages('ধানের রোগ ও সার', 'ধান', 1);
     expect(results.length).toBeLessThanOrEqual(1);
   });
+
+  it('should return empty results for casual greetings like "hi" or "সালাম"', async () => {
+    const enGreeting = await retriever.retrieveRelevantPassages('hi', 'ধান', 2);
+    expect(enGreeting.length).toBe(0);
+
+    const bnGreeting = await retriever.retrieveRelevantPassages('সালাম কেমন আছেন', 'ধান', 2);
+    expect(bnGreeting.length).toBe(0);
+  });
 });

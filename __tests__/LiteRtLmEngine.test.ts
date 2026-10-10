@@ -43,4 +43,28 @@ describe('LiteRtLmEngine', () => {
 
     expect(tokens.length).toBeLessThan(5);
   });
+
+  it('should stream helpful greeting response for English "hi"', async () => {
+    await engine.initialize();
+    const tokens: string[] = [];
+    for await (const chunk of engine.generateStream('hi')) {
+      tokens.push(chunk);
+    }
+    const full = tokens.join('');
+    expect(full).toContain('Shalik');
+    expect(full).toContain('farm assistant');
+    expect(full).not.toContain('Based on the symptoms, this appears to be Rice Blast');
+  });
+
+  it('should stream polite greeting response for Bangla "সালাম কেমন আছেন"', async () => {
+    await engine.initialize();
+    const tokens: string[] = [];
+    for await (const chunk of engine.generateStream('সালাম কেমন আছেন')) {
+      tokens.push(chunk);
+    }
+    const full = tokens.join('');
+    expect(full).toContain('শালিক');
+    expect(full).toContain('কৃষি পরামর্শক');
+    expect(full).not.toContain('ব্লাস্ট বা বাদামী দাগ রোগ হতে পারে');
+  });
 });

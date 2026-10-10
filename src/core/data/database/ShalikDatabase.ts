@@ -8,6 +8,8 @@ import { ConversationEntity, ChatMessageEntity, AlertEntity, FarmerProfileEntity
 
 type Listener = () => void;
 
+const STORAGE_KEY = 'shalik_offline_db_v1';
+
 export class ShalikDatabase {
   private static instance: ShalikDatabase | null = null;
 
@@ -23,7 +25,11 @@ export class ShalikDatabase {
   private listeners: Set<Listener> = new Set();
 
   private constructor() {
-    this.seedDefaultData();
+    const loaded = this.loadFromStorage();
+    if (!loaded) {
+      this.seedDefaultData();
+      this.persist();
+    }
   }
 
   public static getInstance(): ShalikDatabase {
@@ -39,6 +45,81 @@ export class ShalikDatabase {
   }
 
   private notify() {
+    this.persist();
+    this.listeners.forEach(fn => {
+      try { fn(); } catch (e) { /* no-op */ }
+    });
+  }
+
+  private loadFromStorage(): boolean {
+    try {
+      if (typeof localStorage !== 'undefined') {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (Array.isArray(parsed.conversations)) {
+            this.conversations = new Map(parsed.conversations);
+          }
+          if (Array.isArray(parsed.messages)) {
+            this.messages = new Map(parsed.messages);
+          }
+          if (Array.isArray(parsed.alerts)) {
+            this.alerts = new Map(parsed.alerts);
+          }
+          if (Array.isArray(parsed.users)) {
+            this.users = new Map(parsed.users);
+          }
+          if (parsed.farmerProfile) {
+            this.farmerProfile = parsed.farmerProfile;
+          }
+          if (typeof parsed.conversationIdSeq === 'number') {
+            this.conversationIdSeq = parsed.conversationIdSeq;
+          }
+          if (typeof parsed.messageIdSeq === 'number') {
+            this.messageIdSeq = parsed.messageIdSeq;
+          }
+          return true;
+        }
+      }
+    } catch (e) {
+      console.warn('Failed to restore from storage:', e);
+    }
+    return false;
+  }
+
+  private persist(): void {
+    try {
+      if (typeof localStorage !== 'undefined') {
+        const payload = {
+          conversations: Array.from(this.conversations.entries()),
+          messages: Array.from(this.messages.entries()),
+          alerts: Array.from(this.alerts.entries()),
+          users: Array.from(this.users.entries()),
+          farmerProfile: this.farmerProfile,
+          conversationIdSeq: this.conversationIdSeq,
+          messageIdSeq: this.messageIdSeq
+        };
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
+      }
+    } catch (e) {
+      // Storage unavailable or quota limit
+    }
+  }
+
+  public resetDatabase(): void {
+    try {
+      if (typeof localStorage !== 'undefined') {
+        localStorage.removeItem(STORAGE_KEY);
+      }
+    } catch (_) {}
+    this.conversations.clear();
+    this.messages.clear();
+    this.alerts.clear();
+    this.users.clear();
+    this.conversationIdSeq = 1;
+    this.messageIdSeq = 1;
+    this.seedDefaultData();
+    this.persist();
     this.listeners.forEach(fn => {
       try { fn(); } catch (e) { /* no-op */ }
     });
@@ -160,19 +241,12 @@ export class ShalikDatabase {
           this.notify();
         }
       },
-      deleteConversation: async (id: number): Promise<void> => {
-        this.conversations.delete(id);
-        // Cascade delete messages
-        for (const [mId, msg] of this.messages.entries()) {
-          if (msg.conversationId === id) {
-            this.messages.delete(mId);
-          }
-        }
-        this.notify();
+      getConversationById: async (id: number): Promise<ConversationEntity | null> => {
+        return this.conversations.get(id) || null;
       },
-      getMessagesForConversation: async (conversationId: number): Promise<ChatMessageEntity[]> => {
+      getMessagesForConversation: async (convId: number): Promise<ChatMessageEntity[]> => {
         return Array.from(this.messages.values())
-          .filter(m => m.conversationId === conversationId)
+          .filter(m => m.conversationId === convId)
           .sort((a, b) => a.timestamp - b.timestamp);
       },
       insertMessage: async (msg): Promise<number> => {
@@ -190,10 +264,19 @@ export class ShalikDatabase {
         this.notify();
         return id;
       },
-      deleteMessagesForConversation: async (conversationId: number): Promise<void> => {
-        for (const [mId, msg] of this.messages.entries()) {
-          if (msg.conversationId === conversationId) {
-            this.messages.delete(mId);
+      deleteMessagesForConversation: async (convId: number): Promise<void> => {
+        for (const [id, msg] of this.messages.entries()) {
+          if (msg.conversationId === convId) {
+            this.messages.delete(id);
+          }
+        }
+        this.notify();
+      },
+      deleteConversation: async (convId: number): Promise<void> => {
+        this.conversations.delete(convId);
+        for (const [id, msg] of this.messages.entries()) {
+          if (msg.conversationId === convId) {
+            this.messages.delete(id);
           }
         }
         this.notify();
