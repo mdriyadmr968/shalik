@@ -12,12 +12,37 @@ export interface AuthResult {
 
 export class AuthManager {
   private static instance: AuthManager | null = null;
+  private static readonly SESSION_STORAGE_KEY = 'shalik_auth_session_user_v1';
   private currentUser: User | null = null;
   private listeners: Set<AuthListener> = new Set();
   private db: ShalikDatabase;
 
   private constructor() {
     this.db = ShalikDatabase.getInstance();
+    this.restoreSession();
+  }
+
+  private restoreSession() {
+    try {
+      if (typeof localStorage !== 'undefined') {
+        const raw = localStorage.getItem(AuthManager.SESSION_STORAGE_KEY);
+        if (raw) {
+          this.currentUser = JSON.parse(raw);
+        }
+      }
+    } catch (_) {}
+  }
+
+  private saveSession(user: User | null) {
+    try {
+      if (typeof localStorage !== 'undefined') {
+        if (user) {
+          localStorage.setItem(AuthManager.SESSION_STORAGE_KEY, JSON.stringify(user));
+        } else {
+          localStorage.removeItem(AuthManager.SESSION_STORAGE_KEY);
+        }
+      }
+    } catch (_) {}
   }
 
   public static getInstance(): AuthManager {
@@ -33,6 +58,7 @@ export class AuthManager {
   }
 
   private notify() {
+    this.saveSession(this.currentUser);
     this.listeners.forEach(fn => {
       try { fn(this.currentUser); } catch (e) { /* ignore */ }
     });

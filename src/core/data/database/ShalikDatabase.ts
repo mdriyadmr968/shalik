@@ -258,7 +258,8 @@ export class ShalikDatabase {
           text: msg.text,
           timestamp: msg.timestamp || Date.now(),
           imageUri: msg.imageUri || null,
-          citedSourcesCsv: msg.citedSourcesCsv || ''
+          citedSourcesCsv: msg.citedSourcesCsv || '',
+          isSynced: 'isSynced' in msg ? (msg as any).isSynced : false
         };
         this.messages.set(id, entity);
         this.notify();
@@ -290,7 +291,12 @@ export class ShalikDatabase {
         return this.farmerProfile;
       },
       saveProfile: async (profile: FarmerProfileEntity): Promise<void> => {
-        this.farmerProfile = { ...profile, id: 1 };
+        this.farmerProfile = {
+          ...profile,
+          id: 1,
+          isSynced: false,
+          updatedAt: Date.now()
+        };
         this.notify();
       }
     };
@@ -310,11 +316,11 @@ export class ShalikDatabase {
         return this.alerts.get(alertId) || null;
       },
       insertAlert: async (alert: AlertEntity): Promise<void> => {
-        this.alerts.set(alert.id, alert);
+        this.alerts.set(alert.id, { ...alert, isSynced: alert.isSynced ?? false });
         this.notify();
       },
       insertAlerts: async (alerts: AlertEntity[]): Promise<void> => {
-        alerts.forEach(a => this.alerts.set(a.id, a));
+        alerts.forEach(a => this.alerts.set(a.id, { ...a, isSynced: a.isSynced ?? false }));
         this.notify();
       },
       markAsRead: async (alertId: string): Promise<void> => {
@@ -365,5 +371,76 @@ export class ShalikDatabase {
         this.notify();
       }
     };
+  }
+
+  // ============================================================================
+  // Online / Real Database Synchronization APIs
+  // ============================================================================
+
+  public getUnsyncedMessages(): ChatMessageEntity[] {
+    return Array.from(this.messages.values()).filter(m => m.isSynced === false);
+  }
+
+  public markMessagesSynced(ids: number[]): void {
+    const idSet = new Set(ids);
+    this.messages.forEach(m => {
+      if (idSet.has(m.id)) {
+        m.isSynced = true;
+      }
+    });
+    this.persist();
+  }
+
+  public getUnsyncedAlerts(): AlertEntity[] {
+    return Array.from(this.alerts.values()).filter(a => a.isSynced === false);
+  }
+
+  public markAlertsSynced(ids: string[]): void {
+    const idSet = new Set(ids);
+    this.alerts.forEach(a => {
+      if (idSet.has(a.id)) {
+        a.isSynced = true;
+      }
+    });
+    this.persist();
+  }
+
+  public getProfile(): FarmerProfileEntity | null {
+    return this.farmerProfile;
+  }
+
+  public isProfileSynced(): boolean {
+    return this.farmerProfile?.isSynced !== false;
+  }
+
+  public markProfileSynced(): void {
+    if (this.farmerProfile) {
+      this.farmerProfile.isSynced = true;
+      this.persist();
+    }
+  }
+
+  public getPendingSyncCount(): number {
+    let count = 0;
+    count += this.getUnsyncedMessages().length;
+    count += this.getUnsyncedAlerts().length;
+    if (this.farmerProfile && this.farmerProfile.isSynced === false) {
+      count += 1;
+    }
+    return count;
+  }
+
+  public mergeRemoteAlerts(incomingAlerts: AlertEntity[]): number {
+    let newCount = 0;
+    for (const alert of incomingAlerts) {
+      if (!this.alerts.has(alert.id)) {
+        this.alerts.set(alert.id, { ...alert, isSynced: true });
+        newCount++;
+      }
+    }
+    if (newCount > 0) {
+      this.notify();
+    }
+    return newCount;
   }
 }

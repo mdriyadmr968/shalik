@@ -16,13 +16,16 @@ import { BanglaFormatters } from '../util/BanglaFormatters';
 import { Colors } from '../../../theme/colors';
 import { LanguageManager } from '../../../i18n/LanguageManager';
 import { Language } from '../../../i18n/translations';
+import { SyncManager, SyncState } from '../../../core/sync/SyncManager';
 
 interface AssistantScreenProps {
   viewModel: AssistantViewModel;
 }
 
 export const AssistantScreen: React.FC<AssistantScreenProps> = ({ viewModel }) => {
+  const syncManager = SyncManager.getInstance();
   const [uiState, setUiState] = useState<AssistantUiState>(viewModel.getState());
+  const [syncState, setSyncState] = useState<SyncState>(syncManager.getState());
   const [inputText, setInputText] = useState('');
   const [transcriptInput, setTranscriptInput] = useState('');
   const [lang, setLang] = useState<Language>(LanguageManager.getInstance().getLanguage());
@@ -42,9 +45,14 @@ export const AssistantScreen: React.FC<AssistantScreenProps> = ({ viewModel }) =
       setLang(newLang);
     });
 
+    const unsubSync = syncManager.subscribe(newSyncState => {
+      setSyncState(newSyncState);
+    });
+
     return () => {
       unsubVm();
       unsubLang();
+      unsubSync();
     };
   }, [viewModel]);
 
@@ -54,7 +62,9 @@ export const AssistantScreen: React.FC<AssistantScreenProps> = ({ viewModel }) =
 
   const handleSend = () => {
     if (inputText.trim()) {
-      viewModel.sendQuery(inputText.trim());
+      viewModel.sendQuery(inputText.trim()).then(() => {
+        syncManager.syncAll();
+      });
       setInputText('');
     }
   };
@@ -105,11 +115,39 @@ export const AssistantScreen: React.FC<AssistantScreenProps> = ({ viewModel }) =
         </View>
       </View>
 
-      {/* Offline Status Banner */}
-      <View style={styles.statusBanner}>
-        <Text style={styles.statusText}>{t.offlineActive}</Text>
+      {/* Dynamic Offline / Online Cloud Sync Status Banner */}
+      <TouchableOpacity
+        style={styles.statusBanner}
+        onPress={() => syncManager.syncAll()}
+        activeOpacity={0.8}
+      >
+        <View style={styles.syncStatusLeft}>
+          <View
+            style={[
+              styles.syncDot,
+              {
+                backgroundColor: !syncState.isOnline
+                  ? '#FF9800'
+                  : syncState.status === 'syncing'
+                  ? '#2196F3'
+                  : '#4CAF50'
+              }
+            ]}
+          />
+          <Text style={styles.statusText}>
+            {!syncState.isOnline
+              ? (lang === 'en' ? 'Offline Mode (Local Storage)' : 'অফলাইন মোড (স্থানীয় সংরক্ষণ)')
+              : syncState.status === 'syncing'
+              ? (lang === 'en' ? 'Syncing to Cloud...' : 'ক্লাউড সিঙ্ক হচ্ছে...')
+              : syncState.pendingCount > 0
+              ? (lang === 'en'
+                  ? `Online • ${syncState.pendingCount} pending sync`
+                  : `অনলাইন • ${BanglaFormatters.toBanglaDigits(syncState.pendingCount)}টি তথ্য সিঙ্ক বাকি`)
+              : (lang === 'en' ? 'Online • Cloud Synced' : 'অনলাইন • ক্লাউড সিঙ্ক সম্পন্ন')}
+          </Text>
+        </View>
         <Text style={styles.hotlineText}>{t.emergencyHotline}</Text>
-      </View>
+      </TouchableOpacity>
 
       {/* Attached Image Notice */}
       {uiState.attachedImageUri && (
@@ -381,9 +419,20 @@ const styles = StyleSheet.create({
   statusBanner: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+    alignItems: 'center',
     backgroundColor: Colors.agriculturalGreenBanner,
     paddingHorizontal: 16,
     paddingVertical: 6
+  },
+  syncStatusLeft: {
+    flexDirection: 'row',
+    alignItems: 'center'
+  },
+  syncDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    marginRight: 6
   },
   statusText: {
     fontSize: 12,

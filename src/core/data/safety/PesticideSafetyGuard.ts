@@ -1,5 +1,5 @@
 export interface SafetyCheckResult {
-  isApproved: Boolean;
+  isApproved: boolean;
   sanitizedResponse: string;
   detectedViolations: string[];
   requiresHelplineEscalation: boolean;

@@ -26,6 +26,7 @@ export interface ChatMessageEntity {
   timestamp: number;
   imageUri?: string | null;
   citedSourcesCsv: string;
+  isSynced?: boolean;
 }
 
 export function chatMessageEntityToDomain(entity: ChatMessageEntity): ChatMessage {
@@ -61,6 +62,8 @@ export interface FarmerProfileEntity {
   primaryCropsCsv: string;
   isOnboarded: boolean;
   preferredLanguage: string;
+  isSynced?: boolean;
+  updatedAt?: number;
 }
 
 export function farmerProfileEntityToDomain(entity: FarmerProfileEntity): FarmerProfile {
@@ -83,7 +86,9 @@ export function farmerProfileToEntity(domain: FarmerProfile): FarmerProfileEntit
     upazila: domain.upazila,
     primaryCropsCsv: (domain.primaryCrops || []).join(','),
     isOnboarded: domain.isOnboarded,
-    preferredLanguage: domain.preferredLanguage
+    preferredLanguage: domain.preferredLanguage,
+    updatedAt: Date.now(),
+    isSynced: false
   };
 }
 
@@ -102,6 +107,7 @@ export interface AlertEntity {
   signature: string;
   receivedAt: number;
   isRead: boolean;
+  isSynced?: boolean;
 }
 
 export function alertEntityToDomain(entity: AlertEntity): ShalikAlert {
