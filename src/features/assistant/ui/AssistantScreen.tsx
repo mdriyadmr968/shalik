@@ -8,7 +8,8 @@ import {
   StyleSheet,
   Modal,
   SafeAreaView,
-  ActivityIndicator
+  ActivityIndicator,
+  Image
 } from 'react-native';
 import { AssistantViewModel, AssistantUiState } from '../viewmodel/AssistantViewModel';
 import { ChatMessage, MessageSender } from '../../../core/data/models/ChatMessage';
@@ -77,11 +78,31 @@ export const AssistantScreen: React.FC<AssistantScreenProps> = ({ viewModel }) =
     }
   };
 
-  const handleAttachMockImage = () => {
-    if (uiState.attachedImageUri) {
-      viewModel.removeAttachedImage();
+  const handlePickImage = () => {
+    if (typeof document !== 'undefined') {
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.accept = 'image/*';
+      input.onchange = (e: any) => {
+        const file = e.target?.files?.[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = (event) => {
+            const result = event.target?.result as string;
+            if (result) {
+              viewModel.attachImage(result, 130);
+            }
+          };
+          reader.readAsDataURL(file);
+        }
+      };
+      input.click();
     } else {
-      viewModel.attachImage('file:///mock/leaf_image.jpg', 130);
+      if (uiState.attachedImageUri) {
+        viewModel.removeAttachedImage();
+      } else {
+        viewModel.attachImage('file:///mock/leaf_image.jpg', 130);
+      }
     }
   };
 
@@ -149,14 +170,32 @@ export const AssistantScreen: React.FC<AssistantScreenProps> = ({ viewModel }) =
         <Text style={styles.hotlineText}>{t.emergencyHotline}</Text>
       </TouchableOpacity>
 
-      {/* Attached Image Notice */}
+      {/* Attached Image Notice & Thumbnail Preview */}
       {uiState.attachedImageUri && (
         <View style={styles.imageNoticeBanner}>
-          <Text style={styles.imageNoticeText}>{t.imageAttached}</Text>
-          {uiState.imageQualityWarning && (
-            <Text style={styles.imageWarningText}>⚠️ {uiState.imageQualityWarning}</Text>
-          )}
-          <TouchableOpacity onPress={() => viewModel.removeAttachedImage()}>
+          <View style={styles.imageNoticeLeft}>
+            {Boolean(
+              uiState.attachedImageUri.startsWith('data:image/') ||
+              uiState.attachedImageUri.startsWith('http') ||
+              uiState.attachedImageUri.startsWith('file://')
+            ) && (
+              <Image
+                source={{ uri: uiState.attachedImageUri }}
+                style={styles.imageThumbnail}
+                resizeMode="cover"
+              />
+            )}
+            <View style={styles.imageNoticeTextContainer}>
+              <Text style={styles.imageNoticeText}>{t.imageAttached}</Text>
+              {uiState.imageQualityWarning && (
+                <Text style={styles.imageWarningText}>⚠️ {uiState.imageQualityWarning}</Text>
+              )}
+            </View>
+          </View>
+          <TouchableOpacity
+            style={styles.removeImageBtn}
+            onPress={() => viewModel.removeAttachedImage()}
+          >
             <Text style={styles.removeImageText}>{t.removeImage}</Text>
           </TouchableOpacity>
         </View>
@@ -210,6 +249,16 @@ export const AssistantScreen: React.FC<AssistantScreenProps> = ({ viewModel }) =
                       {uiState.ttsState.type === 'Speaking' ? t.listening : t.listen}
                     </Text>
                   </TouchableOpacity>
+                </View>
+              )}
+
+              {msg.imageUri && (
+                <View style={styles.bubbleImageContainer}>
+                  <Image
+                    source={{ uri: msg.imageUri }}
+                    style={styles.bubbleImage}
+                    resizeMode="cover"
+                  />
                 </View>
               )}
 
@@ -275,7 +324,7 @@ export const AssistantScreen: React.FC<AssistantScreenProps> = ({ viewModel }) =
       <View style={styles.bottomBar}>
         <TouchableOpacity
           style={styles.iconButton}
-          onPress={handleAttachMockImage}
+          onPress={handlePickImage}
         >
           <Text style={styles.iconButtonText}>
             {uiState.attachedImageUri ? '📷✓' : '📷'}
@@ -450,7 +499,25 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     backgroundColor: Colors.yellowNoticeBg,
     paddingHorizontal: 12,
-    paddingVertical: 8
+    paddingVertical: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: '#FFE082'
+  },
+  imageNoticeLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+    marginRight: 8
+  },
+  imageThumbnail: {
+    width: 44,
+    height: 44,
+    borderRadius: 6,
+    marginRight: 10,
+    backgroundColor: '#E0E0E0'
+  },
+  imageNoticeTextContainer: {
+    flex: 1
   },
   imageNoticeText: {
     fontSize: 12,
@@ -460,6 +527,10 @@ const styles = StyleSheet.create({
   imageWarningText: {
     fontSize: 11,
     color: Colors.warningRed
+  },
+  removeImageBtn: {
+    paddingHorizontal: 8,
+    paddingVertical: 4
   },
   removeImageText: {
     fontSize: 12,
@@ -510,6 +581,17 @@ const styles = StyleSheet.create({
     padding: 12,
     borderRadius: 16,
     elevation: 2
+  },
+  bubbleImageContainer: {
+    marginBottom: 8,
+    borderRadius: 8,
+    overflow: 'hidden'
+  },
+  bubbleImage: {
+    width: 200,
+    height: 140,
+    borderRadius: 8,
+    backgroundColor: '#EEEEEE'
   },
   userBubble: {
     backgroundColor: Colors.agriculturalGreen,

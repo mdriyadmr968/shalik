@@ -200,6 +200,19 @@ Launches at `http://localhost:3000/` consuming minimal memory.
 npm start
 ```
 
+### 6. Cloud Database Synchronization (Supabase)
+Shalik implements an **offline-first architecture**: all data (farmer profiles, conversations, messages, alerts) is saved locally on device immediately and works without internet. When an internet connection becomes available, Shalik automatically synchronizes with Supabase.
+
+1. Create a project at [supabase.com](https://supabase.com).
+2. Go to **SQL Editor**, paste the contents of [`supabase_schema.sql`](supabase_schema.sql), and click **Run**.
+3. Copy your **Project URL** and **anon public key** from *Project Settings > API*.
+4. Add them to your `.env` file:
+   ```env
+   VITE_SUPABASE_URL=https://your-project-id.supabase.co
+   VITE_SUPABASE_ANON_KEY=your-supabase-anon-key
+   ```
+5. Shalik's status banner will display `🟢 Online • Cloud Synced` and automatically sync conversations, profiles, and download new meteorological alerts.
+
 ---
 
 ## 🔒 Privacy & Safety Guarantee

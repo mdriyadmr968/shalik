@@ -186,7 +186,7 @@ export class SyncManager {
       'apikey': anonKey,
       'Authorization': `Bearer ${anonKey}`,
       'Content-Type': 'application/json',
-      'Prefer': 'return=representation'
+      'Prefer': 'return=representation,resolution=merge-duplicates'
     };
 
     // 1. Push un-synced chat messages
@@ -218,6 +218,7 @@ export class SyncManager {
       const profile = this.db.getProfile();
       if (profile) {
         const payload = {
+          local_id: profile.id,
           farmer_name: profile.farmerName,
           district: profile.district,
           upazila: profile.upazila,

@@ -298,7 +298,9 @@ export class AssistantViewModel {
       let fullRawResponse = '';
       this.isCancelling = false;
 
-      for await (const chunk of this.llmEngine.generateStream(prompt)) {
+      for await (const chunk of this.llmEngine.generateStream(prompt, {
+        imageBase64: attachedImg || undefined
+      })) {
         if (this.isCancelling) break;
 
         if (ttftTime === 0) {

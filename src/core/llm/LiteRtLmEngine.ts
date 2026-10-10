@@ -11,6 +11,7 @@ export interface GenerationParams {
   topK?: number;
   maxOutputTokens?: number;
   systemPrompt?: string;
+  imageBase64?: string;
 }
 
 export const DEFAULT_SYSTEM_PROMPT =
@@ -140,6 +141,23 @@ export class LiteRtLmEngine {
     const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:streamGenerateContent?alt=sse&key=${apiKey}`;
 
     const systemInstruction = params.systemPrompt || DEFAULT_SYSTEM_PROMPT;
+    const userParts: any[] = [];
+
+    if (params.imageBase64 && params.imageBase64.startsWith('data:image/')) {
+      const parts = params.imageBase64.split(';base64,');
+      const mimeType = parts[0].replace('data:', '') || 'image/jpeg';
+      const rawBase64 = parts[1];
+      if (rawBase64) {
+        userParts.push({
+          inline_data: {
+            mime_type: mimeType,
+            data: rawBase64
+          }
+        });
+      }
+    }
+    userParts.push({ text: prompt });
+
     const body = {
       system_instruction: {
         parts: [{ text: systemInstruction }]
@@ -147,7 +165,7 @@ export class LiteRtLmEngine {
       contents: [
         {
           role: 'user',
-          parts: [{ text: prompt }]
+          parts: userParts
         }
       ],
       generationConfig: {

@@ -40,7 +40,42 @@ export class BanglaTextToSpeech {
     this.stop();
     this.setState({ type: 'Speaking' });
 
-    // Duration estimated based on word count (~150 words per minute at 0.85 rate)
+    // 1. If Web SpeechSynthesis is available (Browser / Web environment)
+    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+      try {
+        window.speechSynthesis.cancel();
+        const utterance = new SpeechSynthesisUtterance(cleaned);
+        const isEnglish = /[a-zA-Z]/.test(cleaned) && !/[\u0980-\u09FF]/.test(cleaned);
+        utterance.lang = isEnglish ? 'en-US' : 'bn-BD';
+        utterance.rate = 0.9;
+        utterance.pitch = 1.0;
+
+        const voices = window.speechSynthesis.getVoices();
+        const preferredVoice = voices.find(v =>
+          isEnglish ? v.lang.startsWith('en') : v.lang.startsWith('bn')
+        );
+        if (preferredVoice) {
+          utterance.voice = preferredVoice;
+        }
+
+        utterance.onend = () => {
+          this.setState({ type: 'Idle' });
+          if (onDone) onDone();
+        };
+
+        utterance.onerror = () => {
+          this.setState({ type: 'Idle' });
+          if (onDone) onDone();
+        };
+
+        window.speechSynthesis.speak(utterance);
+        return;
+      } catch (e) {
+        console.warn('SpeechSynthesis error, falling back to timer:', e);
+      }
+    }
+
+    // 2. Fallback timer for Node/Testing environments or unsupported devices
     const wordCount = cleaned.split(/\s+/).length;
     const durationMs = Math.min(Math.max(wordCount * 350, 1500), 8000);
 
@@ -51,6 +86,12 @@ export class BanglaTextToSpeech {
   }
 
   public stop(): void {
+    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+      try {
+        window.speechSynthesis.cancel();
+      } catch (_) {}
+    }
+
     if (this.speakingTimer) {
       clearTimeout(this.speakingTimer);
       this.speakingTimer = null;

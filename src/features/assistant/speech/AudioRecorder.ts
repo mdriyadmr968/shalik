@@ -7,11 +7,13 @@ export type RecordingState =
 export class AudioRecorder {
   public static readonly SAMPLE_RATE = 16000;
   public static readonly MAX_RECORDING_DURATION_MS = 30000;
+  public static lastCapturedTranscript: string | null = null;
 
   private state: RecordingState = { type: 'Idle' };
   private recordingTimer: any = null;
   private startTime: number = 0;
   private listeners: Set<(state: RecordingState) => void> = new Set();
+  private recognition: any = null;
 
   public getState(): RecordingState {
     return this.state;
@@ -27,11 +29,45 @@ export class AudioRecorder {
     this.listeners.forEach(fn => fn(this.state));
   }
 
-  public async startRecording(outputFilePath: string): Promise<boolean> {
+  public async startRecording(
+    outputFilePath: string = 'farmer_voice.wav',
+    lang: string = 'bn-BD'
+  ): Promise<boolean> {
     if (this.state.type === 'Recording') return false;
 
+    AudioRecorder.lastCapturedTranscript = null;
     this.startTime = Date.now();
     this.setState({ type: 'Recording', durationMs: 0, amplitude: 0.2 });
+
+    // Initialize Web Speech Recognition in browser environments
+    if (typeof window !== 'undefined') {
+      const SpeechRecognition =
+        (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+      if (SpeechRecognition) {
+        try {
+          this.recognition = new SpeechRecognition();
+          this.recognition.lang = lang.startsWith('en') ? 'en-US' : 'bn-BD';
+          this.recognition.continuous = true;
+          this.recognition.interimResults = true;
+
+          this.recognition.onresult = (event: any) => {
+            let fullText = '';
+            for (let i = 0; i < event.results.length; i++) {
+              fullText += event.results[i][0].transcript;
+            }
+            if (fullText.trim()) {
+              AudioRecorder.lastCapturedTranscript = fullText.trim();
+            }
+          };
+
+          this.recognition.onerror = () => {
+            // Non-fatal, speech will fall back to audio heuristic
+          };
+
+          this.recognition.start();
+        } catch (_) {}
+      }
+    }
 
     this.recordingTimer = setInterval(() => {
       const elapsed = Date.now() - this.startTime;
@@ -56,6 +92,13 @@ export class AudioRecorder {
       this.recordingTimer = null;
     }
 
+    if (this.recognition) {
+      try {
+        this.recognition.stop();
+      } catch (_) {}
+      this.recognition = null;
+    }
+
     if (this.state.type === 'Recording') {
       const elapsed = Date.now() - this.startTime;
       this.setState({
@@ -72,6 +115,12 @@ export class AudioRecorder {
     if (this.recordingTimer) {
       clearInterval(this.recordingTimer);
       this.recordingTimer = null;
+    }
+    if (this.recognition) {
+      try {
+        this.recognition.stop();
+      } catch (_) {}
+      this.recognition = null;
     }
     this.setState({ type: 'Idle' });
   }
