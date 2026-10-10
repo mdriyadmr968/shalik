@@ -1,30 +1,30 @@
 # Shalik (শালিক) — Offline Farm Assistant for Bangladesh
 
-[![Android](https://img.shields.io/badge/Android-10%2B%20(API%2029%2B)-3DDC84?style=flat&logo=android&logoColor=white)](android/)
-[![Runtime](https://img.shields.io/badge/Runtime-LiteRT--LM%20(W4A16)-4285F4?style=flat&logo=google&logoColor=white)](docs/SYSTEM_DOCUMENTATION.md)
-[![Model](https://img.shields.io/badge/Model-Gemma%203n%20E2B-FF6F00?style=flat)](docs/MODEL_CARD.md)
-[![Connectivity](https://img.shields.io/badge/Offline-100%25%20Air--Gapped-success)](docs/PRIVACY_POLICY.md)
-[![Language](https://img.shields.io/badge/Language-Bangla%20Native%20(বাংলা)-E91E63)](data/DATASET_CARD.md)
-[![Build Status](https://img.shields.io/badge/Build-Passing-brightgreen)](.github/workflows/android.yml)
+[![React Native](https://img.shields.io/badge/React%20Native-0.74-61DAFB?style=flat&logo=react&logoColor=black)](https://reactnative.dev)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.4-3178C6?style=flat&logo=typescript&logoColor=white)](https://www.typescriptlang.org)
+[![Offline](https://img.shields.io/badge/Offline-100%25%20On--Device-success)](docs/PRIVACY_POLICY.md)
+[![Language](https://img.shields.io/badge/Bangla-Native%20(বাংলা)-E91E63)](data/DATASET_CARD.md)
+[![Build Status](https://img.shields.io/badge/CI-Passing-brightgreen)](.github/workflows/ci.yml)
 
 > **"ফসলের রোগ শনাক্ত ও সমাধান — ইন্টারনেট ছাড়াই আপনার হাতের মুঠোয়"**  
 > *(Crop disease diagnosis and trusted remedies — right in your hand without the internet)*
 
-**Shalik (শালিক)** is an open-source, 100% on-device offline smartphone assistant engineered specifically for rural smallholder farmers in Bangladesh. Named after the *শালিক* (common myna) — the watchful, pest-eating bird inhabiting every Bengal paddy field — Shalik operates completely inside the phone without requiring a cellular internet connection.
+**Shalik (শালিক)** is an open-source, 100% on-device offline assistant engineered specifically for rural smallholder farmers in Bangladesh, built with **React Native & TypeScript**. Named after the *শালিক* (common myna) — the watchful, pest-eating bird inhabiting every Bengal paddy field — Shalik operates completely inside the phone without requiring a cellular internet connection.
 
-Farmers photograph a diseased plant leaf and ask questions aloud in spoken Bangla. Within seconds, Shalik diagnoses the pathology, provides step-by-step remedies cited directly from official agricultural research publications, and warns about local flood and heatwave hazards.
+Farmers photograph a diseased plant leaf and ask questions aloud in spoken Bangla. Within seconds, Shalik diagnoses the pathology, provides step-by-step remedies cited directly from official agricultural research publications (**DAE**, **BRRI**, **BARI**, **BARC**), and warns about local flood and heatwave hazards.
 
 ---
 
 ## 🌟 Core Capabilities
 
-- 📷 **See (দৃষ্টি):** On-device leaf symptom diagnosis combining an ultra-fast **EfficientNet-Lite0 int8** classifier (38 ms, 89.2% Top-1) and **Gemma 3n multimodal vision**.
-- 🎙️ **Hear (শ্রবণ):** Direct spoken Bangla query understanding (10.9% CER across Barisal, Chittagong, Sylhet, Rangpur, and Rajshahi dialects, even amidst 60–75 dB field noise).
-- 🧠 **Know (জ্ঞান):** Instruction fine-tuned with 4-bit QLoRA on authoritative Bangladeshi extension publications (**DAE**, **BRRI**, **BARI**, **BARC**).
+- 📷 **See (দৃষ্টি):** On-device leaf symptom diagnosis combining an ultra-fast **EfficientNet-Lite0 int8** classifier and **Gemma 3n multimodal vision**.
+- 🎙️ **Hear (শ্রবণ):** Direct spoken Bangla query understanding across Barisal, Chittagong, Sylhet, Rangpur, and Rajshahi dialects.
+- 🧠 **Know (জ্ঞান):** Instruction fine-tuned with 4-bit QLoRA on authoritative Bangladeshi extension publications.
 - 📚 **Ground (উৎস):** Sub-millisecond offline RAG search across a versioned SQLite FTS5 index (`kb-v1.sqlite`), citing official research sources for every recommendation.
 - 🛡️ **Protect (নিরাপত্তা):** Strict rule-based post-filtering intercepting banned agrochemicals (Paraquat, Endosulfan, DDT, Carbofuran) and escalating ambiguous cases to the **16123 Krishi Call Center**.
 - 🔊 **Speak (বচন):** Full Bengali Text-to-Speech (TTS) readout designed for farmers with low textual literacy.
 - ⚠️ **Warn (সতর্কতা):** Opportunistic Wi-Fi sync and structured SMS fallback for **FFWC flood** and **BMD heatwave** alerts with agronomist-approved action steps.
+- 🔐 **Secure (নিরাপত্তা ও ভূমিকা):** Air-gapped offline-first authentication and Role-Based Access Control (RBAC) supporting Farmer, Extension Officer (SAAO), and Administrator roles.
 
 ---
 
@@ -62,36 +62,70 @@ graph TD
 
 ---
 
-## 📊 Milestone Completion Tracker
+## 🏗️ Architecture & Modules (`src/`)
 
-All milestones outlined in the comprehensive [Implementation Plan](docs/IMPLEMENTATION_PLAN.md) are completed and verified:
+### 1. Core Data & Domain Layer (`src/core/data/`)
+- **Models (`models/`):**
+  - `ChatMessage.ts`: Typed user and AI dialogue with support for token streaming and agricultural research citations (`BRRI`, `BARI`, `DAE`).
+  - `Alert.ts`: Common Alerting Protocol (CAP) aligned schema with 5 disaster types (`HEAT`, `FLOOD`, `CYCLONE`, `HEAVY_RAIN`, `COLD`) and 4 severity levels (`ADVISORY`, `WATCH`, `WARNING`, `EMERGENCY`).
+  - `FarmerProfile.ts`: Offline profile capturing farmer district, upazila, and primary crops (ধান, আলু, ইত্যাদি).
+- **Database Layer (`database/`):**
+  - `ShalikDatabase.ts`: Reactive SQLite-compatible database with entity-domain mappers and `Flow`-like reactive subscriptions.
+  - `ChatDao.ts`, `AlertDao.ts`, `FarmerProfileDao.ts`: Data Access Objects adhering to Room database specifications.
+- **Repository Pattern (`repository/`):**
+  - `ChatRepository.ts`, `AlertRepository.ts`, `FarmerProfileRepository.ts`.
 
-| Milestone | Scope | Key Deliverable | Status |
-|---|---|---|:---:|
-| **M0** | Feasibility Spikes & ADRs | Gemma 3n benchmark, ASR CER test, ADR-0001…0004 | ✅ Complete |
-| **M1** | App Skeleton & Offline Text Chat | Jetpack Compose Bangla UI, LiteRT-LM streaming, Room DB | ✅ Complete |
-| **M2** | Multimodal Input (Camera + Voice) | CameraX capture, 16kHz PCM recorder, Bangla TTS | ✅ Complete |
-| **M3** | Data Pipeline & Knowledge Base | Bijoy-to-Unicode, 5k SFT dataset, held-out eval sets | ✅ Complete |
-| **M4** | LoRA Fine-Tuning & Model Packaging | Unsloth LoRA, EfficientNet int8 (+24.9 rubric score gain) | ✅ Complete |
-| **M5** | Offline RAG & Safety Guardrail | SQLite FTS5 index, pesticide interceptor, citation UI | ✅ Complete |
-| **M6** | Heat & Flood Alert Integration | CAP schema, opportunistic sync, SMS fallback, action templates | ✅ Complete |
-| **M7** | Field Pilot & Hardening | 30-farmer pilot simulation (93.3% success), low-RAM adaptive mode | ✅ Complete |
-| **M8** | Release & Offline Distribution | v1.0.0 release build, ProGuard rules, offline side-load kit | ✅ Complete |
+### 2. Safety & RAG Layer (`src/core/data/safety/`, `src/core/data/rag/`)
+- **Pesticide Safety Guardrail (`PesticideSafetyGuard.ts`):**
+  - Intercepts government-banned agrochemicals (Paraquat, Endosulfan, Carbofuran, Monocrotophos, DDT) in Bengali and English.
+  - Intercepts low-confidence recommendations ($< 0.45$) and redirects farmers to **16123 Krishi Call Center**.
+- **Offline RAG Search (`OfflineRetriever.ts`):**
+  - Token-scored sub-millisecond retrieval across verified Bengali agricultural corpus (BRRI Rice Knowledge Bank, DAE IPM Guide, BARI Handbook).
+- **Field Telemetry (`FieldTelemetryLogger.ts`):**
+  - Profiles Time-to-First-Token (TTFT), total latency, tokens generated, peak RAM, and farmer ratings into structured JSONL logs.
 
----
+### 3. On-Device LLM & Device Adaptation (`src/core/llm/`)
+- **Device Capability Detector (`DeviceCapabilityDetector.ts`):**
+  - Categorizes hardware into Entry 4GB, Mid 6GB, and High 8GB+ tiers.
+  - Dynamically configures context window (512 vs 1024 vs 2048 tokens) and activates low-RAM mode.
+- **Model Manager (`ModelManager.ts`):**
+  - Verifies SHA-256 integrity checksums and manages local `.litertlm` model weights.
+- **LiteRT-LM GenAI Engine (`LiteRtLmEngine.ts`):**
+  - Simulates 28 tokens/sec on-device streaming generation with cancellation and prompt templates.
 
-## 📈 Performance Benchmarks (6 GB Reference Phone)
+### 4. Multimodal Assistant (`src/features/assistant/`)
+- **Prompt Builder (`MultimodalPromptBuilder.ts`):**
+  - Automatically identifies the 6 Bengali seasons (গ্রীষ্মকাল, বর্ষাকাল, শরৎকাল, হেমন্তকাল, শীতকাল, বসন্তকাল).
+  - Injects active climate warnings, vision classifier tags, and RAG citations.
+- **Speech & Audio (`speech/`):**
+  - 16kHz PCM audio recorder with Bengali live timer.
+  - Direct Bengali Speech-to-Text (`SpeechToText.ts`, `GemmaAudioSpeechToText.ts`).
+  - Rural-adapted Bangla Text-to-Speech (`BanglaTextToSpeech.ts`) with punctuation and markdown stripping.
+- **Vision Quality Inspector (`ImageQualityChecker.ts`):**
+  - Checks leaf photo luminance (too dark $<40$, too bright $>225$) and prompts the farmer with clear Bengali photography advice.
+- **Formatters (`BanglaFormatters.ts`):**
+  - Formats numerals to Bengali digits ($0 \to \text{০}, 1 \to \text{১}, \dots$).
 
-| Benchmark Metric | Target Budget | Shalik Measured Result | Verdict |
-|---|---|---|:---:|
-| **Model Cold Load Time** | $\le 10\text{ s}$ | **6.4 s** | 🚀 PASS |
-| **Classifier Latency (Leaf Image)** | $\le 150\text{ ms}$ | **38.0 ms** | 🚀 PASS |
-| **RAG Retrieval Latency (SQLite FTS5)** | $\le 800\text{ ms}$ | **0.33 ms** | 🚀 PASS |
-| **Time to First Token (TTFT)** | $\le 3.0\text{ s}$ | **2.29 s** | 🚀 PASS |
-| **Full Generation (~120 tokens)** | $\le 12.0\text{ s}$ | **9.30 s** | 🚀 PASS |
-| **Peak App RAM (KV Cache loaded)** | $\le 2.5\text{ GB}$ | **2.14 GB** | 🚀 PASS |
-| **Storage Footprint (App + Models + KB)** | $\le 3.5\text{ GB}$ | **3.12 GB** | 🚀 PASS |
-| **Banned Pesticide Recommendations** | **0** | **0 (100% blocked)** | 🛡️ PASS |
+### 5. Disaster & Weather Alerts (`src/features/alerts/`)
+- **Agronomist Action Templates (`AlertActionTemplates.ts`):**
+  - Specific, actionable emergency guides for heatwaves, floods, heavy rain, cyclones, and cold waves.
+- **SMS Fallback Receiver (`SmsAlertReceiver.ts`):**
+  - Parses encrypted broadcast SMS alerts (`SHALIK|<TYPE>|<SEV>|<DISTRICT>|<MSG>|<HMAC>`).
+- **Alert Sync (`AlertSyncWorker.ts`):**
+  - Background synchronization for signed disaster notices and automatic expiration purging.
+
+### 6. Offline Authentication & RBAC Authorization (`src/core/auth/`)
+- **100% Air-Gapped Security (`PinHasher.ts`):**
+  - Salted SHA-256 cryptographic PIN hashing implemented in pure TypeScript without cloud dependencies.
+  - Strict Bangladeshi mobile number format validation (`013`-`019` prefixes).
+- **Multi-Role RBAC System (`models/User.ts`, `AuthManager.ts`):**
+  - **🌾 Farmer (`FARMER`)**: Ask crop diagnosis queries, view disaster alerts, manage profile.
+  - **🛡️ Extension Officer (`OFFICER` - SAAO)**: Broadcast emergency regional alerts, inspect field telemetry diagnostics.
+  - **⚙️ Administrator (`ADMIN`)**: Full system control, promote/manage user roles, review guardrail rules.
+- **Seeded Demo Accounts (Available with 1-Tap Quick Login):**
+  - **Farmer**: Phone `01711000001` | PIN `1234` (*Karim Mia*)
+  - **SAAO Officer**: Phone `01811000002` | PIN `5678` (*Dr. Rafiqul Islam*)
+  - **Administrator**: Phone `01911000003` | PIN `9999` (*Agri Admin*)
 
 ---
 
@@ -99,21 +133,27 @@ All milestones outlined in the comprehensive [Implementation Plan](docs/IMPLEMEN
 
 ```
 shalik/
-├── android/                   # Android Studio Gradle Project (Kotlin, Jetpack Compose)
-│   ├── app/                   # Application launcher, ProGuard rules, Hilt container
+├── src/                       # React Native & TypeScript source code
 │   ├── core/
-│   │   ├── llm/               # LiteRT-LM engine, ModelManager, DeviceCapabilityDetector
-│   │   └── data/              # Room DB, RAG OfflineRetriever, PesticideSafetyGuard, Telemetry
-│   └── feature/
-│       ├── assistant/         # CameraX, AudioRecorder, TTS, MultimodalPromptBuilder, UI
-│       └── alerts/            # WorkManager sync, SmsAlertReceiver, ActionTemplates, UI
-├── ml/                        # Machine Learning Pipeline
+│   │   ├── auth/              # Offline authentication, PIN hasher, RBAC models
+│   │   ├── data/              # SQLite DB, repositories, DAOs, RAG retriever, safety guard
+│   │   └── llm/               # LiteRT-LM engine, model manager, hardware detector
+│   ├── features/
+│   │   ├── admin/             # Administrator console screen
+│   │   ├── alerts/            # Disaster alerts screen, SMS receiver, sync worker
+│   │   ├── assistant/         # Camera, audio recorder, speech/TTS, multimodal assistant
+│   │   ├── auth/              # Offline login & role selection screen
+│   │   └── profile/           # Farmer profile management screen
+│   ├── i18n/                  # Bilingual localization (Bangla / English)
+│   └── theme/                 # Design tokens and color themes
+├── __tests__/                 # Comprehensive Jest test suite (60+ tests)
+├── ml/                        # Machine Learning Pipeline (Python)
 │   ├── finetune/              # LoRA training scripts (Unsloth + TRL)
 │   ├── classifier/            # EfficientNet-Lite0 training & quantization
 │   ├── dataset_generators/    # SFT dialogue generator in ShareGPT format
 │   ├── convert/               # LiteRT-LM conversion toolchain & GGUF fallback
 │   └── eval/                  # Milestone verification battery & rubric scoring
-├── knowledge/                 # Extension Corpus Engineering
+├── knowledge/                 # Agricultural Knowledge Corpus Engineering
 │   ├── clean_and_chunk.py     # Bijoy-to-Unicode normalizer & semantic chunker
 │   ├── build_index.py         # SQLite FTS5 & hash vector database builder
 │   └── sources.yaml           # Agricultural provenance manifest (DAE, BRRI, BARI)
@@ -123,47 +163,41 @@ shalik/
 │   ├── field_pilot_test.py    # Milestone M7 30-farmer pilot simulator
 │   ├── package_offline_kit.py # Milestone M8 offline SD-card distribution builder
 │   └── benchmark_device.py    # Hardware profiling script
-└── docs/                      # Comprehensive Documentation
-    ├── IMPLEMENTATION_PLAN.md # 22-week roadmap & task breakdown
-    ├── TESTING_PLAN.md        # Quality gates & test execution protocols
-    ├── SYSTEM_DOCUMENTATION.md# Architectural specification & runbooks
-    ├── PRIVACY_POLICY.md      # Zero-cloud bilingual privacy policy
-    ├── REPRODUCIBILITY.md     # Step-by-step training & build reproduction guide
-    ├── MODEL_CARD.md          # Gemma 3n fine-tuned model card
-    └── adr/                   # Architecture Decision Records (ADR-0001…0004)
+└── docs/                      # Comprehensive Documentation & Architecture Specs
 ```
 
 ---
 
-## 🛠️ Quick Start & Reproduction
+## 🚀 Getting Started
 
-### 1. Run Verification Batteries
+### Prerequisites
+- **Node.js:** $\ge 18$
+- **npm** or **yarn**
+
+### 1. Install Dependencies
 ```bash
-# Clone the repository
-git clone https://github.com/mdriyadmr968/shalik.git
-cd shalik
-
-# Install Python ML dependencies
-pip install -r ml/requirements.txt
-
-# Run M5 RAG & Safety Interceptor Verification
-python ml/eval/evaluate_m5_rag_safety.py
-
-# Run M6 Climate Alert & SMS Fallback Verification
-python ml/eval/evaluate_m6_alerts.py
-
-# Run M7 Field Pilot Simulation
-python tools/field_pilot_test.py
-
-# Build Offline Distribution Package
-python tools/package_offline_kit.py
+npm install
 ```
 
-### 2. Android Build
-Open the `android/` directory in Android Studio (Jellyfish or newer with JDK 17):
+### 2. Run Test Suite
 ```bash
-cd android
-./gradlew assembleDebug
+npm test
+```
+
+### 3. TypeScript Type-Check
+```bash
+npm run type-check
+```
+
+### 4. Low-Resource Web Preview (Vite)
+```bash
+npm run web
+```
+Launches at `http://localhost:3000/` consuming minimal memory.
+
+### 5. Start Mobile Metro Bundler
+```bash
+npm start
 ```
 
 ---
