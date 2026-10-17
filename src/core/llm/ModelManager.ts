@@ -1,5 +1,5 @@
 import { DeviceCapabilityDetector } from './DeviceCapabilityDetector';
-import * as crypto from 'crypto';
+import { PinHasher } from '../auth/security/PinHasher';
 
 export type ModelState =
   | { type: 'NotInstalled' }
@@ -47,7 +47,7 @@ export class ModelManager {
 
   public verifyChecksum(content: string, expectedSha256: string): boolean {
     try {
-      const hash = crypto.createHash('sha256').update(content).digest('hex');
+      const hash = PinHasher.sha256(content);
       return hash.toLowerCase() === expectedSha256.toLowerCase();
     } catch (e) {
       return false;

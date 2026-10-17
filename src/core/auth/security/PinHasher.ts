@@ -25,7 +25,7 @@ export class PinHasher {
     return /^\d{4}$/.test(pin.trim());
   }
 
-  private static sha256(ascii: string): string {
+  public static sha256(ascii: string): string {
     function rightRotate(value: number, amount: number) {
       return (value >>> amount) | (value << (32 - amount));
     }
