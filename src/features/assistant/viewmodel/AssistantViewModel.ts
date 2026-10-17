@@ -62,7 +62,7 @@ export class AssistantViewModel {
     this.modelManager = new ModelManager();
     this.offlineRetriever = new OfflineRetriever();
     this.pesticideSafetyGuard = new PesticideSafetyGuard();
-    this.telemetryLogger = new FieldTelemetryLogger();
+    this.telemetryLogger = FieldTelemetryLogger.getInstance();
     this.promptBuilder = new MultimodalPromptBuilder();
     this.audioRecorder = new AudioRecorder();
     this.textToSpeech = new BanglaTextToSpeech();

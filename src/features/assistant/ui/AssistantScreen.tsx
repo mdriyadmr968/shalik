@@ -18,6 +18,7 @@ import { Colors } from '../../../theme/colors';
 import { LanguageManager } from '../../../i18n/LanguageManager';
 import { Language } from '../../../i18n/translations';
 import { SyncManager, SyncState } from '../../../core/sync/SyncManager';
+import { ImageQualityChecker } from '../vision/ImageQualityChecker';
 
 interface AssistantScreenProps {
   viewModel: AssistantViewModel;
@@ -88,10 +89,11 @@ export const AssistantScreen: React.FC<AssistantScreenProps> = ({ viewModel }) =
         const file = e.target?.files?.[0];
         if (file) {
           const reader = new FileReader();
-          reader.onload = (event) => {
+          reader.onload = async (event) => {
             const result = event.target?.result as string;
             if (result) {
-              viewModel.attachImage(result, 130);
+              const luminance = await ImageQualityChecker.analyzeImageLuminance(result);
+              viewModel.attachImage(result, luminance);
             }
           };
           reader.readAsDataURL(file);

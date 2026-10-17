@@ -37,4 +37,31 @@ describe('AlertsViewModel', () => {
     viewModel.dismissDetail();
     expect(viewModel.getState().selectedAlert).toBeNull();
   });
+
+  it('should honor specific alert.actionTemplateIds when available', async () => {
+    const customAlert = {
+      id: 'alert_custom_cold',
+      type: AlertType.COLD,
+      severity: AlertSeverity.WARNING,
+      districtCodes: ['রংপুর'],
+      upazilaCodes: [],
+      validFromIso: new Date().toISOString(),
+      validToIso: new Date(Date.now() + 86400000).toISOString(),
+      messageBn: 'শৈত্যপ্রবাহ সতর্কতা',
+      messageEn: 'Cold wave alert',
+      source: 'DAE',
+      actionTemplateIds: ['act_cold_potato_blight'],
+      signature: 'sig_mock',
+      receivedAt: Date.now(),
+      isRead: false
+    };
+
+    await viewModel.selectAlert(customAlert);
+    const state = viewModel.getState();
+
+    expect(state.selectedAlert).toBe(customAlert);
+    expect(state.selectedTemplates.length).toBe(1);
+    expect(state.selectedTemplates[0].templateId).toBe('act_cold_potato_blight');
+    expect(state.selectedTemplates[0].titleBn).toContain('আলুর নাবি ধসা');
+  });
 });

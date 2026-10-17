@@ -72,7 +72,20 @@ export class AlertsViewModel {
   public async selectAlert(alert: ShalikAlert): Promise<void> {
     const profile = await this.profileRepository.getFarmerProfile();
     const primaryCrop = profile.primaryCrops[0] || 'ধান';
-    const templates = AlertActionTemplates.getTemplatesForAlert(alert.type, primaryCrop);
+
+    let templates: ActionTemplate[] = [];
+    if (alert.actionTemplateIds && alert.actionTemplateIds.length > 0) {
+      for (const tid of alert.actionTemplateIds) {
+        const found = AlertActionTemplates.getTemplateById(tid);
+        if (found) {
+          templates.push(found);
+        }
+      }
+    }
+
+    if (templates.length === 0) {
+      templates = AlertActionTemplates.getTemplatesForAlert(alert.type, primaryCrop);
+    }
 
     this.setState({
       selectedAlert: alert,

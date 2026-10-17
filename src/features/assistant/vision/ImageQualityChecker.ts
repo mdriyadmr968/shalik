@@ -44,4 +44,56 @@ export class ImageQualityChecker {
       warningMessage: warning
     };
   }
+
+  /**
+   * Evaluates average perceptual luminance from an image data URL or image source using an offscreen HTML canvas.
+   * Returns a luminance value in the range [0, 255].
+   * Falls back gracefully to 128 if canvas or image loading is unavailable (e.g. Node/SSR).
+   */
+  public static async analyzeImageLuminance(imageSrc: string): Promise<number> {
+    if (typeof Image === 'undefined' || typeof document === 'undefined') {
+      return 128;
+    }
+
+    return new Promise((resolve) => {
+      try {
+        const img = new Image();
+        img.crossOrigin = 'anonymous';
+        img.onload = () => {
+          try {
+            const canvas = document.createElement('canvas');
+            const sampleSize = 64; // Downscale to 64x64 for fast luminance analysis
+            canvas.width = sampleSize;
+            canvas.height = sampleSize;
+            const ctx = canvas.getContext('2d');
+            if (!ctx) {
+              resolve(128);
+              return;
+            }
+            ctx.drawImage(img, 0, 0, sampleSize, sampleSize);
+            const imageData = ctx.getImageData(0, 0, sampleSize, sampleSize);
+            const data = imageData.data;
+            let totalLuminance = 0;
+            const pixelCount = sampleSize * sampleSize;
+
+            for (let i = 0; i < data.length; i += 4) {
+              const r = data[i];
+              const g = data[i + 1];
+              const b = data[i + 2];
+              // Standard ITU-R BT.601 perceptual luminance formula
+              totalLuminance += 0.299 * r + 0.587 * g + 0.114 * b;
+            }
+
+            resolve(totalLuminance / pixelCount);
+          } catch (e) {
+            resolve(128);
+          }
+        };
+        img.onerror = () => resolve(128);
+        img.src = imageSrc;
+      } catch (err) {
+        resolve(128);
+      }
+    });
+  }
 }
