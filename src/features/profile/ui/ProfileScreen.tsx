@@ -45,10 +45,20 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
 
   useEffect(() => {
     repository.getFarmerProfile().then(p => {
-      setProfile(p);
-      setFarmerName(p.farmerName);
-      setDistrict(p.district);
-      setUpazila(p.upazila);
+      const activeUser = AuthManager.getInstance().getCurrentUser();
+      const resolvedName = (activeUser && activeUser.name) ? activeUser.name : p.farmerName;
+      const resolvedDistrict = (activeUser && activeUser.district) ? activeUser.district : p.district;
+      const resolvedUpazila = (activeUser && activeUser.upazila) ? activeUser.upazila : p.upazila;
+
+      setProfile({
+        ...p,
+        farmerName: resolvedName,
+        district: resolvedDistrict,
+        upazila: resolvedUpazila
+      });
+      setFarmerName(resolvedName);
+      setDistrict(resolvedDistrict);
+      setUpazila(resolvedUpazila);
       setCropsText(p.primaryCrops.join(', '));
     });
 
@@ -58,6 +68,11 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
 
     const unsubAuth = AuthManager.getInstance().subscribe(user => {
       setCurrentUser(user);
+      if (user) {
+        if (user.name) setFarmerName(user.name);
+        if (user.district) setDistrict(user.district);
+        if (user.upazila) setUpazila(user.upazila);
+      }
     });
 
     return () => {
@@ -88,6 +103,15 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
 
     await repository.saveProfile(updated);
     setProfile(updated);
+
+    if (currentUser) {
+      await AuthManager.getInstance().updateCurrentUserProfile({
+        name: farmerName,
+        district,
+        upazila
+      });
+    }
+
     setSavedSuccess(true);
     setTimeout(() => setSavedSuccess(false), 3000);
   };

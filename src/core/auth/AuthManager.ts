@@ -249,4 +249,17 @@ export class AuthManager {
     this.notify();
     return true;
   }
+
+  public async updateCurrentUserProfile(params: { name?: string; district?: string; upazila?: string }): Promise<void> {
+    if (!this.currentUser) return;
+    const updatedUser: User = {
+      ...this.currentUser,
+      ...(params.name !== undefined ? { name: params.name } : {}),
+      ...(params.district !== undefined ? { district: params.district } : {}),
+      ...(params.upazila !== undefined ? { upazila: params.upazila } : {})
+    };
+    await this.db.userDao().updateUser(updatedUser);
+    this.currentUser = updatedUser;
+    this.notify();
+  }
 }

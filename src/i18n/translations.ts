@@ -28,6 +28,9 @@ export interface Translations {
   voiceDialogHint: string;
   cancel: string;
   confirmAndSend: string;
+  history: string;
+  historyTitle: string;
+  noHistory: string;
 
   // Alerts Screen
   alertsTitle: string;
@@ -122,6 +125,9 @@ export const translations: Record<Language, Translations> = {
     voiceDialogHint: 'দরকার হলে লেখাটি পরিবর্তন করে নিশ্চিত করুন।',
     cancel: 'বাতিল',
     confirmAndSend: 'নিশ্চিত ও প্রেরণ',
+    history: 'ইতিহাস',
+    historyTitle: 'পূর্ববর্তী পরামর্শসমূহ',
+    noHistory: 'কোনো পূর্ববর্তী পরামর্শ পাওয়া যায়নি',
 
     // Alerts Screen
     alertsTitle: 'দুর্যোগ ও কৃষি আবহাওয়া',
@@ -215,6 +221,9 @@ export const translations: Record<Language, Translations> = {
     voiceDialogHint: 'Edit text if necessary before submitting.',
     cancel: 'Cancel',
     confirmAndSend: 'Confirm & Send',
+    history: 'History',
+    historyTitle: 'Past Consultations',
+    noHistory: 'No past consultations found',
 
     // Alerts Screen
     alertsTitle: 'Disaster & Agro-Climate',

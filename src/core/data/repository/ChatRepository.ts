@@ -35,10 +35,15 @@ export class ChatRepository {
   }
 
   async updateConversationPreview(conversationId: number, preview: string): Promise<void> {
+    const existing = await this.chatDao.getConversationById(conversationId);
+    const title = existing?.title && existing.title !== 'নতুন পরামর্শ' && existing.title !== 'New Consultation'
+      ? existing.title
+      : (preview.length > 32 ? preview.slice(0, 32) + '...' : preview);
+    const createdAt = existing?.createdAt || Date.now();
     await this.chatDao.updateConversation({
       id: conversationId,
-      title: 'পরামর্শ',
-      createdAt: Date.now(),
+      title,
+      createdAt,
       lastMessagePreview: preview
     });
   }

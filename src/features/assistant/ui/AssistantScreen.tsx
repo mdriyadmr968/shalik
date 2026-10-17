@@ -30,6 +30,7 @@ export const AssistantScreen: React.FC<AssistantScreenProps> = ({ viewModel }) =
   const [inputText, setInputText] = useState('');
   const [transcriptInput, setTranscriptInput] = useState('');
   const [lang, setLang] = useState<Language>(LanguageManager.getInstance().getLanguage());
+  const [showHistoryModal, setShowHistoryModal] = useState(false);
   const scrollViewRef = useRef<ScrollView>(null);
 
   const t = LanguageManager.getInstance().getTranslations();
@@ -116,6 +117,14 @@ export const AssistantScreen: React.FC<AssistantScreenProps> = ({ viewModel }) =
         </View>
 
         <View style={styles.topBarActions}>
+          {/* History Button */}
+          <TouchableOpacity
+            style={styles.historyBtn}
+            onPress={() => setShowHistoryModal(true)}
+          >
+            <Text style={styles.historyBtnText}>📜 {t.history}</Text>
+          </TouchableOpacity>
+
           {/* Language Toggle Button */}
           <TouchableOpacity
             style={styles.langToggleBtn}
@@ -403,6 +412,91 @@ export const AssistantScreen: React.FC<AssistantScreenProps> = ({ viewModel }) =
                 <Text style={styles.modalConfirmText}>{t.confirmAndSend}</Text>
               </TouchableOpacity>
             </View>
+          </View>
+        </View>
+      </Modal>
+
+      {/* Conversation History Modal */}
+      <Modal
+        visible={showHistoryModal}
+        transparent
+        animationType="slide"
+        onRequestClose={() => setShowHistoryModal(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.historyModalContent}>
+            <View style={styles.historyModalHeader}>
+              <Text style={styles.modalTitle}>📜 {t.historyTitle}</Text>
+              <TouchableOpacity
+                style={styles.closeBtn}
+                onPress={() => setShowHistoryModal(false)}
+              >
+                <Text style={styles.closeBtnText}>✕</Text>
+              </TouchableOpacity>
+            </View>
+
+            <ScrollView style={styles.historyList}>
+              {uiState.conversations.length === 0 ? (
+                <Text style={styles.emptyHistoryText}>{t.noHistory}</Text>
+              ) : (
+                uiState.conversations.map(conv => {
+                  const isActive = conv.id === uiState.currentConversationId;
+                  const dateStr = new Date(conv.createdAt).toLocaleDateString(
+                    lang === 'bn' ? 'bn-BD' : 'en-US',
+                    { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }
+                  );
+                  return (
+                    <View
+                      key={conv.id}
+                      style={[
+                        styles.historyItem,
+                        isActive && styles.historyItemActive
+                      ]}
+                    >
+                      <TouchableOpacity
+                        style={styles.historyItemContent}
+                        onPress={() => {
+                          viewModel.selectConversation(conv.id);
+                          setShowHistoryModal(false);
+                        }}
+                      >
+                        <Text
+                          style={[
+                            styles.historyItemTitle,
+                            isActive && styles.historyItemTitleActive
+                          ]}
+                          numberOfLines={1}
+                        >
+                          {conv.title || (lang === 'bn' ? 'পরামর্শ' : 'Consultation')}
+                        </Text>
+                        {conv.lastMessagePreview ? (
+                          <Text style={styles.historyItemPreview} numberOfLines={1}>
+                            {conv.lastMessagePreview}
+                          </Text>
+                        ) : null}
+                        <Text style={styles.historyItemDate}>{dateStr}</Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity
+                        style={styles.deleteHistoryBtn}
+                        onPress={() => viewModel.deleteConversation(conv.id)}
+                      >
+                        <Text style={styles.deleteHistoryBtnText}>🗑️</Text>
+                      </TouchableOpacity>
+                    </View>
+                  );
+                })
+              )}
+            </ScrollView>
+
+            <TouchableOpacity
+              style={styles.newChatModalBtn}
+              onPress={() => {
+                viewModel.startNewConversation();
+                setShowHistoryModal(false);
+              }}
+            >
+              <Text style={styles.newChatModalBtnText}>+ {t.newChat}</Text>
+            </TouchableOpacity>
           </View>
         </View>
       </Modal>
@@ -796,5 +890,106 @@ const styles = StyleSheet.create({
   modalConfirmText: {
     color: '#FFFFFF',
     fontWeight: 'bold'
+  },
+  historyBtn: {
+    backgroundColor: 'rgba(255,255,255,0.2)',
+    paddingHorizontal: 8,
+    paddingVertical: 5,
+    borderRadius: 14
+  },
+  historyBtnText: {
+    color: '#FFFFFF',
+    fontWeight: 'bold',
+    fontSize: 11
+  },
+  historyModalContent: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 16,
+    padding: 16,
+    width: '100%',
+    maxWidth: 400,
+    maxHeight: '80%'
+  },
+  historyModalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: '#EEEEEE',
+    paddingBottom: 8
+  },
+  closeBtn: {
+    padding: 4
+  },
+  closeBtnText: {
+    fontSize: 16,
+    color: '#666666',
+    fontWeight: 'bold'
+  },
+  historyList: {
+    maxHeight: 350,
+    marginBottom: 12
+  },
+  emptyHistoryText: {
+    textAlign: 'center',
+    color: '#888888',
+    paddingVertical: 24,
+    fontSize: 13
+  },
+  historyItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    padding: 10,
+    borderRadius: 8,
+    backgroundColor: '#F8F9FA',
+    marginBottom: 8,
+    borderWidth: 1,
+    borderColor: '#EAEAEA'
+  },
+  historyItemActive: {
+    borderColor: Colors.agriculturalGreen,
+    backgroundColor: '#E8F5E9'
+  },
+  historyItemContent: {
+    flex: 1,
+    marginRight: 8
+  },
+  historyItemTitle: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: Colors.textPrimary,
+    marginBottom: 2
+  },
+  historyItemTitleActive: {
+    color: Colors.agriculturalGreen,
+    fontWeight: 'bold'
+  },
+  historyItemPreview: {
+    fontSize: 12,
+    color: '#666666',
+    marginBottom: 2
+  },
+  historyItemDate: {
+    fontSize: 10,
+    color: '#999999'
+  },
+  deleteHistoryBtn: {
+    padding: 6
+  },
+  deleteHistoryBtnText: {
+    fontSize: 14
+  },
+  newChatModalBtn: {
+    backgroundColor: Colors.agriculturalGreen,
+    paddingVertical: 10,
+    borderRadius: 8,
+    alignItems: 'center'
+  },
+  newChatModalBtnText: {
+    color: '#FFFFFF',
+    fontWeight: 'bold',
+    fontSize: 13
   }
 });

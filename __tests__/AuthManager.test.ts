@@ -214,5 +214,21 @@ describe('Offline Authentication & RBAC Authorization Suite', () => {
         authManager.updateUserRole('usr_farmer_1', UserRole.ADMIN)
       ).rejects.toThrow('অনুমতি নেই');
     });
+
+    it('updates current user profile fields and propagates to active user', async () => {
+      await authManager.login('01711000001', '1234');
+      expect(authManager.getCurrentUser()?.name).toBe('করিম মিয়া (Karim Mia)');
+
+      await authManager.updateCurrentUserProfile({
+        name: 'আব্দুল করিম',
+        district: 'রংপুর',
+        upazila: 'মিঠাপুকুর'
+      });
+
+      const updated = authManager.getCurrentUser();
+      expect(updated?.name).toBe('আব্দুল করিম');
+      expect(updated?.district).toBe('রংপুর');
+      expect(updated?.upazila).toBe('মিঠাপুকুর');
+    });
   });
 });

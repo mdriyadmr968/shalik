@@ -109,7 +109,20 @@ export class AssistantViewModel {
       modelState: this.modelManager.getModelState()
     });
 
-    await this.startNewConversation();
+    const existingConvs = await this.chatRepository.getConversations();
+    if (existingConvs.length > 0) {
+      const latest = existingConvs[0];
+      const msgs = await this.chatRepository.getMessages(latest.id);
+      this.setState({
+        currentConversationId: latest.id,
+        conversations: existingConvs,
+        messages: msgs,
+        streamingText: '',
+        isGenerating: false
+      });
+    } else {
+      await this.startNewConversation();
+    }
   }
 
   public getState(): AssistantUiState {
@@ -157,6 +170,20 @@ export class AssistantViewModel {
       streamingText: '',
       isGenerating: false
     });
+  }
+
+  public async deleteConversation(convId: number): Promise<void> {
+    await this.chatRepository.deleteConversation(convId);
+    const convs = await this.chatRepository.getConversations();
+    if (this.state.currentConversationId === convId) {
+      if (convs.length > 0) {
+        await this.selectConversation(convs[0].id);
+      } else {
+        await this.startNewConversation();
+      }
+    } else {
+      this.setState({ conversations: convs });
+    }
   }
 
   private async refreshConversations() {

@@ -71,4 +71,23 @@ describe('AssistantViewModel', () => {
     expect(shalikMsg?.text).toContain('ব্লাস্ট');
     expect(shalikMsg?.citedSources.length).toBeGreaterThan(0);
   });
+
+  it('should support starting new conversations, selecting them, and deleting them', async () => {
+    const initialId = viewModel.getState().currentConversationId;
+    expect(initialId).not.toBeNull();
+
+    await viewModel.startNewConversation();
+    const newId = viewModel.getState().currentConversationId;
+    expect(newId).not.toBe(initialId);
+
+    const conversations = viewModel.getState().conversations;
+    expect(conversations.length).toBeGreaterThanOrEqual(2);
+
+    await viewModel.selectConversation(initialId!);
+    expect(viewModel.getState().currentConversationId).toBe(initialId);
+
+    await viewModel.deleteConversation(newId!);
+    const updatedConvs = viewModel.getState().conversations;
+    expect(updatedConvs.find(c => c.id === newId)).toBeUndefined();
+  });
 });
