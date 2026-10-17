@@ -1,9 +1,13 @@
 export enum AlertType {
   HEAT = 'HEAT',
   FLOOD = 'FLOOD',
+  FLASH_FLOOD = 'FLASH_FLOOD',
   CYCLONE = 'CYCLONE',
   HEAVY_RAIN = 'HEAVY_RAIN',
-  COLD = 'COLD'
+  COLD = 'COLD',
+  DROUGHT = 'DROUGHT',
+  PEST = 'PEST',
+  DISEASE_OUTBREAK = 'DISEASE_OUTBREAK'
 }
 
 export interface SeverityDetail {

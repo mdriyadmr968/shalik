@@ -41,15 +41,21 @@ export const AlertsScreen: React.FC<AlertsScreenProps> = ({ viewModel }) => {
   const getTypeIcon = (type: AlertType) => {
     switch (type) {
       case AlertType.FLOOD:
+      case AlertType.FLASH_FLOOD:
         return '🌊';
       case AlertType.HEAT:
         return '☀️';
+      case AlertType.DROUGHT:
+        return '🏜️';
       case AlertType.CYCLONE:
         return '🌪️';
       case AlertType.HEAVY_RAIN:
         return '⛈️';
       case AlertType.COLD:
         return '❄️';
+      case AlertType.PEST:
+      case AlertType.DISEASE_OUTBREAK:
+        return '🐛';
       default:
         return '⚠️';
     }

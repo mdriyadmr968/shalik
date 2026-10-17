@@ -111,9 +111,46 @@ export interface AlertEntity {
 }
 
 export function alertEntityToDomain(entity: AlertEntity): ShalikAlert {
-  let mappedType = AlertType.HEAVY_RAIN;
-  if (Object.values(AlertType).includes(entity.type as AlertType)) {
-    mappedType = entity.type as AlertType;
+  const rawType = (entity.type || '').toUpperCase().trim();
+  let mappedType: AlertType;
+
+  switch (rawType) {
+    case 'HEAT':
+    case 'HEATWAVE':
+      mappedType = AlertType.HEAT;
+      break;
+    case 'FLOOD':
+      mappedType = AlertType.FLOOD;
+      break;
+    case 'FLASH_FLOOD':
+      mappedType = AlertType.FLASH_FLOOD;
+      break;
+    case 'CYCLONE':
+      mappedType = AlertType.CYCLONE;
+      break;
+    case 'HEAVY_RAIN':
+    case 'RAIN':
+      mappedType = AlertType.HEAVY_RAIN;
+      break;
+    case 'COLD':
+    case 'COLD_WAVE':
+      mappedType = AlertType.COLD;
+      break;
+    case 'DROUGHT':
+      mappedType = AlertType.DROUGHT;
+      break;
+    case 'PEST':
+    case 'PEST_OUTBREAK':
+      mappedType = AlertType.PEST;
+      break;
+    case 'DISEASE_OUTBREAK':
+    case 'DISEASE':
+      mappedType = AlertType.DISEASE_OUTBREAK;
+      break;
+    default:
+      mappedType = Object.values(AlertType).includes(entity.type as AlertType)
+        ? (entity.type as AlertType)
+        : AlertType.HEAVY_RAIN;
   }
 
   const severityEntry = Object.values(AlertSeverity).find(s => s.level === entity.severityLevel) || AlertSeverity.ADVISORY;

@@ -118,6 +118,46 @@ export class AlertActionTemplates {
         'Immediately uproot and bury any infected plants showing late blight lesions.'
       ],
       urgencyNoteEn: 'Fungus spreads rapidly on wet foliage; only spray when leaves are dry.'
+    },
+    {
+      templateId: 'act_drought_awd_irrigation',
+      alertType: AlertType.DROUGHT,
+      targetCrop: 'ধান ও রবি ফসল',
+      growthStage: 'বৃদ্ধি পর্যায়',
+      titleBn: 'খরা ও অনাবৃষ্টিতে এডব্লিউডি (AWD) সেচ ব্যবস্থাপনা',
+      actionStepsBn: [
+        'জমিতে অল্টারনেট ওয়েটিং অ্যান্ড ড্রায়িং (AWD) পাইপ বসিয়ে পর্যায়ক্রমিক সেচ দিন।',
+        'পড়ন্ত বিকেলে বা রাতে সেচ প্রদান করুন যাতে বাষ্পীভবনে পানির অপচয় কম হয়।',
+        'ক্ষেতে জৈব মালচিং বা খড় বিছিয়ে মাটির আর্দ্রতা ধরে রাখুন।'
+      ],
+      urgencyNoteBn: 'সতর্কতা: তীব্র খরায় মাটি ফেটে শিকড় ক্ষতিগ্রস্ত হতে দেবেন না।',
+      titleEn: 'AWD Alternate Wetting & Drying Irrigation for Drought',
+      actionStepsEn: [
+        'Implement Alternate Wetting and Drying (AWD) pipes to conserve critical water.',
+        'Irrigate during dusk or late evening to minimize evaporation losses.',
+        'Apply straw mulching to conserve topsoil moisture around roots.'
+      ],
+      urgencyNoteEn: 'Warning: Prevent soil cracking to safeguard root systems.'
+    },
+    {
+      templateId: 'act_general_pest_spray',
+      alertType: AlertType.PEST,
+      targetCrop: 'সকল ফসল',
+      growthStage: 'সকল পর্যায়',
+      titleBn: 'আঞ্চলিক রোগ ও পোকা-মাকড়ের সমন্বিত দমন ব্যবস্থা',
+      actionStepsBn: [
+        'আক্রান্ত গাছের পাতা ও ডাল সাবধানে কেটে মাটির নিচে পুঁতে ফেলুন।',
+        'জমিতে আলোর ফাঁদ ও সেক্স ফেরোমোন ফাঁদ স্থাপন করে পোকার উপস্থিতি যাচাই করুন।',
+        'প্রয়োজনে নিকটস্থ উপ-সহকারী কৃষি কর্মকর্তা (SAAO)-এর পরামর্শে অনুমোদিত বালাইনাশক নির্দেশিত মাত্রায় স্প্রে করুন।'
+      ],
+      urgencyNoteBn: 'জরুরি: কোনো নিষিদ্ধ বা অনিবন্ধিত কীটনাশক প্রয়োগ করবেন না।',
+      titleEn: 'Integrated Pest & Disease Management Protocol',
+      actionStepsEn: [
+        'Prune affected leaves and foliage and bury them deep underground.',
+        'Deploy light traps and pheromone traps to monitor pest population.',
+        'Consult local SAAO officer for approved pesticides and safe dosage rates.'
+      ],
+      urgencyNoteEn: 'Urgent: Never apply banned or unregistered agrochemicals.'
     }
   ];
 
@@ -130,7 +170,18 @@ export class AlertActionTemplates {
           t.targetCrop === 'All Crops')
     );
     if (matched.length > 0) return matched;
-    return AlertActionTemplates.templates.filter(t => t.alertType === alertType);
+
+    const directType = AlertActionTemplates.templates.filter(t => t.alertType === alertType);
+    if (directType.length > 0) return directType;
+
+    if (alertType === AlertType.FLASH_FLOOD) {
+      return AlertActionTemplates.getTemplatesForAlert(AlertType.FLOOD, crop);
+    }
+    if (alertType === AlertType.DISEASE_OUTBREAK) {
+      return AlertActionTemplates.getTemplatesForAlert(AlertType.PEST, crop);
+    }
+
+    return AlertActionTemplates.templates.filter(t => t.alertType === AlertType.HEAVY_RAIN);
   }
 
   public static getTemplateById(id: string): ActionTemplate | null {

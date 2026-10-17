@@ -202,7 +202,7 @@ export class SyncManager {
         cited_sources: m.citedSourcesCsv
       }));
 
-      const res = await fetch(`${supabaseUrl}/rest/v1/chat_messages`, {
+      const res = await fetch(`${supabaseUrl}/rest/v1/chat_messages?on_conflict=local_id`, {
         method: 'POST',
         headers,
         body: JSON.stringify(payload)
@@ -227,7 +227,7 @@ export class SyncManager {
           updated_at: new Date().toISOString()
         };
 
-        const res = await fetch(`${supabaseUrl}/rest/v1/farmer_profiles`, {
+        const res = await fetch(`${supabaseUrl}/rest/v1/farmer_profiles?on_conflict=local_id`, {
           method: 'POST',
           headers,
           body: JSON.stringify(payload)
@@ -239,7 +239,37 @@ export class SyncManager {
       }
     }
 
-    // 3. Pull new alerts
+    // 3. Push un-synced local alerts (e.g. extension officer broadcasts)
+    const unsyncedAlerts = this.db.getUnsyncedAlerts();
+    if (unsyncedAlerts.length > 0) {
+      const alertPayload = unsyncedAlerts.map(a => ({
+        id: a.id,
+        type: a.type,
+        severity_level: a.severityLevel,
+        district_codes: a.districtCodesCsv,
+        upazila_codes: a.upazilaCodesCsv,
+        valid_from: a.validFromIso,
+        valid_to: a.validToIso,
+        message_bn: a.messageBn,
+        message_en: a.messageEn,
+        source: a.source,
+        action_templates: a.actionTemplatesCsv,
+        signature: a.signature,
+        received_at: new Date(a.receivedAt).toISOString()
+      }));
+
+      const alertPushRes = await fetch(`${supabaseUrl}/rest/v1/alerts?on_conflict=id`, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify(alertPayload)
+      });
+
+      if (alertPushRes.ok || alertPushRes.status === 201) {
+        this.db.markAlertsSynced(unsyncedAlerts.map(a => a.id));
+      }
+    }
+
+    // 4. Pull new alerts
     const alertsRes = await fetch(
       `${supabaseUrl}/rest/v1/alerts?select=*&order=received_at.desc&limit=10`,
       { headers }

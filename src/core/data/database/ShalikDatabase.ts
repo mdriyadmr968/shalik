@@ -5,6 +5,7 @@ import { UserDao } from '../../auth/database/UserDao';
 import { User, UserRole } from '../../auth/models/User';
 import { PinHasher } from '../../auth/security/PinHasher';
 import { ConversationEntity, ChatMessageEntity, AlertEntity, FarmerProfileEntity } from './Entities';
+import { DistrictMatcher } from '../util/DistrictMatcher';
 
 type Listener = () => void;
 
@@ -309,7 +310,7 @@ export class ShalikDatabase {
       },
       getAlertsForDistrict: async (districtCode: string): Promise<AlertEntity[]> => {
         return Array.from(this.alerts.values())
-          .filter(a => a.districtCodesCsv.includes(districtCode))
+          .filter(a => DistrictMatcher.matches(a.districtCodesCsv, districtCode))
           .sort((a, b) => b.severityLevel - a.severityLevel || b.receivedAt - a.receivedAt);
       },
       getAlertById: async (alertId: string): Promise<AlertEntity | null> => {
