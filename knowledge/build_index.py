@@ -13,6 +13,7 @@ import json
 import sqlite3
 import argparse
 import math
+import hashlib
 from typing import List, Dict, Any
 
 # Ensure UTF-8 output on Windows consoles
@@ -26,7 +27,8 @@ def simple_bangla_hash_embedding(text: str, dim: int = 128) -> List[float]:
     vec = [0.0] * dim
     words = text.split()
     for w in words:
-        h = hash(w) % dim
+        # Deterministic MD5 hash independent of Python process hash randomization
+        h = int(hashlib.md5(w.encode('utf-8')).hexdigest(), 16) % dim
         vec[h] += 1.0
 
     # L2 normalize

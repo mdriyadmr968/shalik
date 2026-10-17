@@ -40,8 +40,8 @@ def normalize_bengali_text(text: str) -> str:
     text = re.sub(r'[ \t]+', ' ', text)
     # Fix broken Hasanta or Nukta sequences
     text = text.replace("্ া", "্")
-    # Clean zero-width spaces or stray control characters
-    text = re.sub(r'[\u200b\u200c\u200d\uFEFF]', '', text)
+    # Clean zero-width spaces (\u200b) and BOM (\uFEFF) while preserving grammatical Bengali ligatures (ZWJ \u200d, ZWNJ \u200c)
+    text = re.sub(r'[\u200b\uFEFF]', '', text)
     return text.strip()
 
 def chunk_text(text: str, max_words: int = 250, overlap_words: int = 30) -> List[str]:

@@ -24,6 +24,11 @@
 ### ১.৪ পরিসংখ্যান ও ফিল্ড পাইলট (Telemetry & Diagnostics)
 - অ্যাপের পারফরম্যান্স ও এআই-এর গতি পরীক্ষা সংক্রান্ত তথ্য কেবল আপনার অনুমতি সাপেক্ষে নাম-পরিচয়হীনভাবে ফোনে সংরক্ষিত থাকে। আপনার স্পষ্ট সম্মতি ছাড়া কোনো গবেষক বা প্রতিষ্ঠানে এই তথ্য দেওয়া হয় না।
 
+### ১.৫ ঐচ্ছিক ক্লাউড সিঙ্ক এবং জেমিনাই এআই মোড (Optional Cloud Sync & Gemini API)
+- **ডিফল্ট আচরণ:** অ্যাপটি বাই-ডিফল্ট ১০০% অফলাইন ও অন-ডিভাইস মোডে কাজ করে।
+- **ঐচ্ছিক সুপাবেস (Supabase) সিঙ্ক:** ইন্টারনেট সংযোগ সক্রিয় থাকলে এবং ব্যবহারকারী সম্মতি দিলে আঞ্চলিক দুর্যোগ ও আবহাওয়ার সতর্কতা আপডেট করতে ক্লাউড সিঙ্ক ব্যবহৃত হয়। ব্যবহারকারীর গোপন পিন (PIN) কখনোই ক্লাউডে প্লেইন টেক্সট হিসেবে পাঠানো হয় না; এটি অন-ডিভাইসে SHA-256 সল্টেড হ্যাশিং দিয়ে সুরক্ষিত থাকে।
+- **ঐচ্ছিক ক্লাউড এআই (Google Gemini API):** কোনো উন্নত ব্যবহারকারী বা কর্মকর্তা চাইলে নিজস্ব API কী ব্যবহার করে লাইভ ক্লাউড মডেল সক্রিয় করতে পারেন। অফলাইনে থাকলে অ্যাপ স্বয়ংক্রিয়ভাবে অন-ডিভাইস লোকাল মডেলে ফিরে আসে এবং ইন্টারনেটে কোনো কোয়েরি পাঠায় না।
+
 ---
 
 ## 2. English Version
@@ -44,6 +49,11 @@ Shalik is a 100% on-device offline agricultural assistant engineered for rural f
 
 ### 2.4 Offline Telemetry & Field Research
 - Diagnostic logs (latency, token speed, and anonymized satisfaction ratings) remain in the local app sandbox. Data is exported only with the user's voluntary, informed consent for agricultural research.
+
+### 2.5 Optional Cloud Synchronization (Supabase) & Cloud AI (Google Gemini API)
+- **Air-Gapped Default:** Shalik defaults strictly to zero-network, local on-device operation.
+- **Optional Supabase Cloud Sync:** When network connectivity is available and background synchronization is active, emergency disaster advisories and synchronized messages sync over HTTPS to a secured Supabase PostgreSQL database governed by Row-Level Security (RLS). Secret 4-digit PINs are never transmitted over the wire in plaintext; they are salted and hashed with SHA-256 exclusively on-device.
+- **Optional Cloud AI (Google Gemini):** If an administrator or researcher configures an optional `VITE_GEMINI_API_KEY`, live queries may query Google Gemini over encrypted HTTPS for expanded reasoning. When offline or unconfigured, Shalik instantaneously and transparently falls back to the local, offline small language model without sending queries or metadata to the cloud.
 
 ---
 
