@@ -301,6 +301,32 @@ export class LiteRtLmEngine {
           '3. Spray Pymetrozine or Dinotefuran at the base of rice plants (not on leaves).\n\n',
           '⚠️ Emergency note: Spray directed strictly at plant bases.'
         ];
+      } else if (qLower.includes('potato') || qLower.includes('late blight') || qLower.includes('blight')) {
+        return [
+          'In cool and foggy weather, these symptoms indicate Potato Late Blight (*Phytophthora infestans*).\n\n',
+          'Actionable Steps:\n',
+          '1. Temporarily cease field irrigation to reduce ambient canopy humidity.\n',
+          '2. Spray Cymoxanil + Mancozeb (Curzate M8) or Metalaxyl + Mancozeb (Ridomil Gold at 2g per liter of water) every 3-5 days during persistent fog.\n',
+          '3. Promptly uproot severely infected potato plants and bury or burn them outside the field.\n\n',
+          '⚠️ Advisory: Take prompt preventive action before blight spreads across the canopy.'
+        ];
+      } else if (qLower.includes('brinjal') || qLower.includes('eggplant') || (qLower.includes('fruit') && qLower.includes('borer'))) {
+        return [
+          'This matches Eggplant / Brinjal Fruit and Shoot Borer (*Leucinodes orbonalis*) infestation.\n\n',
+          'Actionable Steps:\n',
+          '1. Clip off and safely destroy wilted shoots and infested fruits regularly.\n',
+          '2. Install sex pheromone traps (Lucinlure) at 4-5 traps per bigha (33 decimals).\n',
+          '3. If infestation is severe, spray Spinosad or Emamectin Benzoate at recommended rates.\n\n',
+          '⚠️ Pre-Harvest Interval (PHI): Cease all pesticide spraying at least 7-10 days before harvesting eggplants.'
+        ];
+      } else if (qLower.includes('stem borer') || qLower.includes('dead heart') || qLower.includes('white head')) {
+        return [
+          'This indicates Rice Stem Borer damage (dead hearts during vegetative stage or whiteheads during heading stage).\n\n',
+          'Actionable Steps:\n',
+          '1. Practice perching (place bamboo twigs/branches in field for insectivorous birds) and install light traps.\n',
+          '2. Spray Chlorantraniliprole or Cartap at approved dosage if dead hearts exceed the economic threshold.\n\n',
+          '⚠️ Safety note: Wear personal protective equipment (PPE) and do not spray facing upstream into the wind.'
+        ];
       } else {
         return [
           'I understand your agricultural inquiry.\n\n',

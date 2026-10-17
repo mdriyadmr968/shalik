@@ -12,6 +12,7 @@ import { AudioRecorder, RecordingState } from '../speech/AudioRecorder';
 import { BanglaTextToSpeech, TtsState } from '../speech/BanglaTextToSpeech';
 import { GemmaAudioSpeechToText } from '../speech/GemmaAudioSpeechToText';
 import { ImageQualityChecker } from '../vision/ImageQualityChecker';
+import { LanguageManager } from '../../../i18n/LanguageManager';
 
 export interface AssistantUiState {
   currentConversationId: number | null;
@@ -197,7 +198,8 @@ export class AssistantViewModel {
   }
 
   public startVoiceRecording(outputFile: string = 'farmer_voice.wav') {
-    this.audioRecorder.startRecording(outputFile);
+    const lang = LanguageManager.getInstance().getLanguage();
+    this.audioRecorder.startRecording(outputFile, lang === 'en' ? 'en-US' : 'bn-BD');
   }
 
   public async stopVoiceRecordingAndTranscribe(outputFile: string = 'farmer_voice.wav') {
@@ -228,7 +230,7 @@ export class AssistantViewModel {
     const quality = this.imageQualityChecker.evaluateImageQuality(simulatedLuminance);
     this.setState({
       attachedImageUri: imageUri,
-      imageQualityWarning: quality.warningMessageBn
+      imageQualityWarning: quality.warningMessage || quality.warningMessageBn
     });
   }
 

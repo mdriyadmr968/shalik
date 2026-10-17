@@ -1,6 +1,7 @@
 import { AuthManager } from '../src/core/auth/AuthManager';
 import { UserRole, Permission } from '../src/core/auth/models/User';
 import { PinHasher } from '../src/core/auth/security/PinHasher';
+import { LanguageManager } from '../src/i18n/LanguageManager';
 
 describe('Offline Authentication & RBAC Authorization Suite', () => {
   let authManager: AuthManager;
@@ -229,6 +230,20 @@ describe('Offline Authentication & RBAC Authorization Suite', () => {
       expect(updated?.name).toBe('আব্দুল করিম');
       expect(updated?.district).toBe('রংপুর');
       expect(updated?.upazila).toBe('মিঠাপুকুর');
+    });
+
+    it('returns English error messages when language is set to English', async () => {
+      await LanguageManager.getInstance().setLanguage('en');
+      const result = await authManager.login('01711000001', '0000');
+      expect(result.success).toBe(false);
+      expect(result.error).toContain('Incorrect PIN code');
+
+      const nonExistent = await authManager.login('01799999999', '1234');
+      expect(nonExistent.success).toBe(false);
+      expect(nonExistent.error).toContain('No account found');
+
+      // Reset back to Bengali
+      await LanguageManager.getInstance().setLanguage('bn');
     });
   });
 });

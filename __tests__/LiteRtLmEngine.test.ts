@@ -67,4 +67,28 @@ describe('LiteRtLmEngine', () => {
     expect(full).toContain('কৃষি পরামর্শক');
     expect(full).not.toContain('ব্লাস্ট বা বাদামী দাগ রোগ হতে পারে');
   });
+
+  it('should stream English mock response for potato late blight inquiry', async () => {
+    await engine.initialize();
+    const tokens: string[] = [];
+    for await (const chunk of engine.generateStream('symptoms of potato late blight disease')) {
+      tokens.push(chunk);
+    }
+    const full = tokens.join('');
+    expect(full).toContain('Potato Late Blight');
+    expect(full).toContain('Curzate M8');
+    expect(full).toContain('Ridomil Gold');
+  });
+
+  it('should stream English mock response for brinjal fruit and shoot borer', async () => {
+    await engine.initialize();
+    const tokens: string[] = [];
+    for await (const chunk of engine.generateStream('how to control brinjal fruit and shoot borer')) {
+      tokens.push(chunk);
+    }
+    const full = tokens.join('');
+    expect(full).toContain('Brinjal Fruit and Shoot Borer');
+    expect(full).toContain('Spinosad');
+    expect(full).toContain('Pre-Harvest Interval');
+  });
 });

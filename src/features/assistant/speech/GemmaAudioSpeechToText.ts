@@ -1,6 +1,7 @@
 import { SpeechToText, AsrResult } from './SpeechToText';
 import { LiteRtLmEngine } from '../../../core/llm/LiteRtLmEngine';
 import { AudioRecorder } from './AudioRecorder';
+import { LanguageManager } from '../../../i18n/LanguageManager';
 
 export class GemmaAudioSpeechToText implements SpeechToText {
   public readonly engineName = 'Gemma 3n Native Audio (LiteRT-LM)';
@@ -37,6 +38,10 @@ export class GemmaAudioSpeechToText implements SpeechToText {
   }
 
   private deriveHeuristicTranscript(audioFilePath: string): string {
+    const lang = LanguageManager.getInstance().getLanguage();
+    if (lang === 'en') {
+      return 'Brown spots are visible on rice leaves, what should I do?';
+    }
     return 'ধানের পাতায় বাদামী দাগ দেখা যাচ্ছে, কি করব?';
   }
 }

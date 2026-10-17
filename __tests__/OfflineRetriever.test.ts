@@ -42,4 +42,24 @@ describe('OfflineRetriever', () => {
     const bnGreeting = await retriever.retrieveRelevantPassages('সালাম কেমন আছেন', 'ধান', 2);
     expect(bnGreeting.length).toBe(0);
   });
+
+  it('should retrieve relevant passages for English agricultural queries with English crop aliases', async () => {
+    // Late blight in potato
+    const potatoResults = await retriever.retrieveRelevantPassages('remedy for late blight in potato', 'potato', 2);
+    expect(potatoResults.length).toBeGreaterThan(0);
+    expect(potatoResults[0].crop).toBe('আলু');
+    expect(potatoResults[0].topic).toContain('Potato Late Blight');
+
+    // Brinjal shoot and fruit borer
+    const brinjalResults = await retriever.retrieveRelevantPassages('brinjal shoot and fruit borer pesticide', 'eggplant', 2);
+    expect(brinjalResults.length).toBeGreaterThan(0);
+    expect(brinjalResults[0].crop).toBe('বেগুন');
+    expect(brinjalResults[0].topic).toContain('Eggplant / Brinjal Shoot and Fruit Borer');
+
+    // Rice blast
+    const blastResults = await retriever.retrieveRelevantPassages('rice blast leaf spots treatment', 'rice', 2);
+    expect(blastResults.length).toBeGreaterThan(0);
+    expect(blastResults[0].crop).toBe('ধান');
+    expect(blastResults[0].topic).toContain('Rice Blast');
+  });
 });

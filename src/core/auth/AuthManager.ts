@@ -1,6 +1,7 @@
 import { ShalikDatabase } from '../data/database/ShalikDatabase';
 import { User, UserRole, Permission, RolePermissions } from './models/User';
 import { PinHasher } from './security/PinHasher';
+import { LanguageManager } from '../../i18n/LanguageManager';
 
 export type AuthListener = (user: User | null) => void;
 
@@ -106,19 +107,23 @@ export class AuthManager {
     return permissions.includes(permission);
   }
 
+  private get t() {
+    return LanguageManager.getInstance().getTranslations();
+  }
+
   public async login(phone: string, pin: string): Promise<AuthResult> {
     const cleanedPhone = PinHasher.normalizePhone(phone);
     if (!PinHasher.isValidPhone(cleanedPhone)) {
       return {
         success: false,
-        error: 'অনুগ্রহ করে সঠিক ১১ ডিজিটের মোবাইল নম্বর দিন (যেমন: 017XXXXXXXX)'
+        error: this.t.authErrorInvalidPhone
       };
     }
 
     if (!PinHasher.isValidPin(pin)) {
       return {
         success: false,
-        error: 'অনুগ্রহ করে ৪ ডিজিটের পিন কোড দিন (যেমন: 1234)'
+        error: this.t.authErrorInvalidPin
       };
     }
 
@@ -126,7 +131,7 @@ export class AuthManager {
     if (!user) {
       return {
         success: false,
-        error: 'এই মোবাইল নম্বরে কোনো অ্যাকাউন্ট পাওয়া যায়নি। অনুগ্রহ করে নিবন্ধন করুন।'
+        error: this.t.authErrorUserNotFound
       };
     }
 
@@ -134,7 +139,7 @@ export class AuthManager {
     if (!isPinCorrect) {
       return {
         success: false,
-        error: 'ভুল পিন কোড প্রদান করেছেন। আবার চেষ্টা করুন।'
+        error: this.t.authErrorIncorrectPin
       };
     }
 
@@ -155,21 +160,21 @@ export class AuthManager {
     if (!PinHasher.isValidPhone(cleanedPhone)) {
       return {
         success: false,
-        error: 'অনুগ্রহ করে সঠিক ১১ ডিজিটের মোবাইল নম্বর দিন (যেমন: 017XXXXXXXX)'
+        error: this.t.authErrorInvalidPhone
       };
     }
 
     if (!PinHasher.isValidPin(params.pin)) {
       return {
         success: false,
-        error: 'পিন কোড অবশ্যই ৪ ডিজিটের হতে হবে।'
+        error: this.t.authErrorInvalidPin
       };
     }
 
     if (!params.name || params.name.trim().length < 2) {
       return {
         success: false,
-        error: 'অনুগ্রহ করে আপনার পুরো নাম প্রদান করুন।'
+        error: this.t.authErrorInvalidName
       };
     }
 
@@ -177,7 +182,7 @@ export class AuthManager {
     if (existing) {
       return {
         success: false,
-        error: 'এই মোবাইল নম্বরটি ইতিমধ্যে নিবন্ধিত রয়েছে। লগইন করার চেষ্টা করুন।'
+        error: this.t.authErrorPhoneRegistered
       };
     }
 
@@ -223,7 +228,7 @@ export class AuthManager {
 
     const creds = demoCredentials[role];
     if (!creds) {
-      return { success: false, error: 'অজানা রোল' };
+      return { success: false, error: this.t.authErrorUnknownRole };
     }
     return this.login(creds.phone, creds.pin);
   }
@@ -234,7 +239,7 @@ export class AuthManager {
 
   public async updateUserRole(userId: string, newRole: UserRole): Promise<boolean> {
     if (!this.hasPermission(Permission.MANAGE_USERS)) {
-      throw new Error('অনুমতি নেই: শুধুমাত্র সিস্টেম প্রশাসক ব্যবহারকারীর পদবি পরিবর্তন করতে পারেন');
+      throw new Error(this.t.authErrorPermissionDeniedAdmin);
     }
 
     const user = await this.db.userDao().getUserById(userId);

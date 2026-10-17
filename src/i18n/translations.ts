@@ -89,6 +89,16 @@ export interface Translations {
   telemetryDesc: string;
   userManagementTitle: string;
   changeRole: string;
+  authErrorInvalidPhone: string;
+  authErrorInvalidPin: string;
+  authErrorUserNotFound: string;
+  authErrorIncorrectPin: string;
+  authErrorInvalidName: string;
+  authErrorPhoneRegistered: string;
+  authErrorUnknownRole: string;
+  authErrorPermissionDeniedAdmin: string;
+  imageDarkWarning: string;
+  imageBrightWarning: string;
 }
 
 export const translations: Record<Language, Translations> = {
@@ -186,7 +196,17 @@ export const translations: Record<Language, Translations> = {
     telemetryTitle: 'ফিল্ড টেলিমেট্রি ও সিস্টেম হেলথ',
     telemetryDesc: 'মডেল প্রতিক্রিয়া সময়, অন-ডিভাইস ভেক্টর ক্যাশ ও নিরাপত্তা গার্ডরেল',
     userManagementTitle: 'ব্যবহারকারী ও রোল নিয়ন্ত্রণ',
-    changeRole: 'পদবি পরিবর্তন'
+    changeRole: 'পদবি পরিবর্তন',
+    authErrorInvalidPhone: 'অনুগ্রহ করে সঠিক ১১ ডিজিটের মোবাইল নম্বর দিন (যেমন: 017XXXXXXXX)',
+    authErrorInvalidPin: 'অনুগ্রহ করে ৪ ডিজিটের পিন কোড দিন (যেমন: 1234)',
+    authErrorUserNotFound: 'এই মোবাইল নম্বরে কোনো অ্যাকাউন্ট পাওয়া যায়নি। অনুগ্রহ করে নিবন্ধন করুন।',
+    authErrorIncorrectPin: 'ভুল পিন কোড প্রদান করেছেন। আবার চেষ্টা করুন।',
+    authErrorInvalidName: 'অনুগ্রহ করে আপনার পুরো নাম প্রদান করুন।',
+    authErrorPhoneRegistered: 'এই মোবাইল নম্বরটি ইতিমধ্যে নিবন্ধিত রয়েছে। লগইন করার চেষ্টা করুন।',
+    authErrorUnknownRole: 'অজানা রোল',
+    authErrorPermissionDeniedAdmin: 'অনুমতি নেই: শুধুমাত্র সিস্টেম প্রশাসক ব্যবহারকারীর পদবি পরিবর্তন করতে পারেন',
+    imageDarkWarning: 'ছবিটি বেশি অন্ধকার। দিনের আলোয় বা ফ্ল্যাশ দিয়ে ছবি তুলুন।',
+    imageBrightWarning: 'ছবিতে অতিরিক্ত রোদ বা আলো পড়েছে। ছায়ায় ধরে ছবি তুলুন।'
   },
   en: {
     // Navigation & Tabs
@@ -282,6 +302,16 @@ export const translations: Record<Language, Translations> = {
     telemetryTitle: 'Field Telemetry & Health',
     telemetryDesc: 'Model Latency, On-Device Vector Cache & Guardrail Integrity',
     userManagementTitle: 'User & Role Access Control',
-    changeRole: 'Change Role'
+    changeRole: 'Change Role',
+    authErrorInvalidPhone: 'Please provide a valid 11-digit mobile number (e.g. 017XXXXXXXX)',
+    authErrorInvalidPin: 'Please provide a 4-digit PIN code (e.g. 1234)',
+    authErrorUserNotFound: 'No account found for this mobile number. Please register.',
+    authErrorIncorrectPin: 'Incorrect PIN code entered. Please try again.',
+    authErrorInvalidName: 'Please provide your full name.',
+    authErrorPhoneRegistered: 'This mobile number is already registered. Please try logging in.',
+    authErrorUnknownRole: 'Unknown role',
+    authErrorPermissionDeniedAdmin: 'Permission denied: Only system administrators can update user roles',
+    imageDarkWarning: 'Image is too dark. Please take photo in daylight or with flash.',
+    imageBrightWarning: 'Image is overexposed to harsh sunlight. Please take photo in partial shade.'
   }
 };

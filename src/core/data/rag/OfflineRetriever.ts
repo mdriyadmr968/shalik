@@ -8,6 +8,14 @@ export interface RetrievedChunk {
   relevanceScore: number;
 }
 
+const CROP_ALIASES: Record<string, string[]> = {
+  ধান: ['ধান', 'rice', 'paddy', 'boro', 'aman', 'aus'],
+  আলু: ['আলু', 'potato', 'potatoes', 'alu'],
+  বেগুন: ['বেগুন', 'eggplant', 'brinjal', 'aubergine', 'begun'],
+  টমেটো: ['টমেটো', 'tomato', 'tomatoes'],
+  গম: ['গম', 'wheat', 'gom']
+};
+
 export class OfflineRetriever {
   // Offline agricultural knowledge base curated from BRRI, DAE, BARI publications
   private readonly knowledgeBase: RetrievedChunk[] = [
@@ -16,7 +24,7 @@ export class OfflineRetriever {
       sourceId: 'brri-rkb-blast',
       sourceTitle: 'BRRI Rice Knowledge Bank - রোগ ও বালাই ব্যবস্থাপনা',
       crop: 'ধান',
-      topic: 'ব্লাস্ট রোগ (Rice Blast)',
+      topic: 'ব্লাস্ট রোগ (Rice Blast / Brown Spot)',
       passage: 'ধানের ব্লাস্ট রোগে ট্রাইসাইক্লাজোল গ্রুপের ছত্রাকনাশক (যেমন ট্রুপার বা ট্রাইকো প্রতি লিটার পানিতে ০.৭৫ গ্রাম) অথবা এমিস্টার টপ বিকেলে স্প্রে করতে হয়। অতিরিক্ত ইউরিয়া সার বন্ধ রাখতে হবে এবং জমিতে সার্বক্ষণিক ছিপছিপে পানি ধরে রাখতে হবে।',
       relevanceScore: 1.0
     },
@@ -25,7 +33,7 @@ export class OfflineRetriever {
       sourceId: 'dae-bph-management',
       sourceTitle: 'DAE সমন্বিত বালাই ব্যবস্থাপনা নির্দেশিকা',
       crop: 'ধান',
-      topic: 'বাদামী গাছফড়িং বা কারেন্ট পোকা (BPH)',
+      topic: 'বাদামী গাছফড়িং বা কারেন্ট পোকা (BPH / Brown Plant Hopper)',
       passage: 'বাদামী গাছফড়িং (কারেন্ট পোকা) দমনে জমির পানি ৩-৪ দিন শুকিয়ে নিতে হবে এবং ১০-১২ হাত পর পর বিলি কেটে আলো-বাতাস চলাচলের ব্যবস্থা করতে হবে। আক্রমণ বেশি হলে পাইমেট্রোজিন বা ডিনেটোফুরান গ্রুপের অনুমোদিত কীটনাশক গাছের গোড়ায় স্প্রে করতে হবে। পাতার উপরে স্প্রে করা যাবে না।',
       relevanceScore: 1.0
     },
@@ -34,7 +42,7 @@ export class OfflineRetriever {
       sourceId: 'bari-hatboi-late-blight',
       sourceTitle: 'BARI কৃষি প্রযুক্তি হাতবই - কন্দাল ফসল',
       crop: 'আলু',
-      topic: 'আলুর নাবি ধসা রোগ (Late Blight)',
+      topic: 'আলুর নাবি ধসা রোগ (Potato Late Blight)',
       passage: 'আলুর নাবি ধসা রোগে কুয়াশাচ্ছন্ন আবহাওয়ায় সাইমোক্সানিল + মেনকোজেব (কার্জেট এম-৮) বা মেটাল্যাক্সিল + মেনকোজেব (রিডোমিল গোল্ড প্রতি লিটার পানিতে ২ গ্রাম হারে) ৩-৫ দিন পর পর ২-৩ বার স্প্রে করতে হয়। সেচ সাময়িক বন্ধ রাখতে হবে এবং আক্রান্ত গাছ জমি থেকে সরাতে হবে।',
       relevanceScore: 1.0
     },
@@ -43,7 +51,7 @@ export class OfflineRetriever {
       sourceId: 'brri-urea-schedule',
       sourceTitle: 'BRRI ধান আবাদ নির্দেশিকা',
       crop: 'ধান',
-      topic: 'ইউরিয়া সারের সঠিক কিস্তি ও প্রয়োগ',
+      topic: 'ইউরিয়া সারের সঠিক কিস্তি ও প্রয়োগ (Urea Fertilizer Schedule for Rice)',
       passage: 'বোরো ধানে ইউরিয়া সার সমান ৩ কিস্তিতে প্রয়োগ করতে হয়। ১ম কিস্তি চারা রোপণের ১৫-২০ দিন পর, ২য় কিস্তি ৩৫-৪০ দিন পর (কুশি আসার মাঝামাঝি) এবং ৩য় কিস্তি কাইচ থোড় আসার ৫-৭ দিন আগে। গুটি ইউরিয়া ব্যবহার করলে একবারেই দেওয়া যায়। জমিতে ছিপছিপে পানি থাকা প্রয়োজন।',
       relevanceScore: 1.0
     },
@@ -52,7 +60,7 @@ export class OfflineRetriever {
       sourceId: 'dae-stem-borer',
       sourceTitle: 'DAE সমন্বিত বালাই ব্যবস্থাপনা (IPM)',
       crop: 'ধান',
-      topic: 'মাজরা পোকা (Stem Borer) - মরা ডিগ ও সাদা শিষ',
+      topic: 'মাজরা পোকা (Rice Stem Borer) - মরা ডিগ ও সাদা শিষ (Dead Heart & White Head)',
       passage: 'মাজরা পোকা দমনে জমিতে ডালপালা পুঁতে পার্চিং করুন এবং আলোর ফাঁদ ব্যবহার করে মা মথ ধ্বংস করুন। কুশি অবস্থায় মরা ডিগ বা শিষ অবস্থায় সাদা শিষ দেখা দিলে ক্লোরানট্রানিলিপ্রোল বা কার্টাপ গ্রুপের অনুমোদিত কীটনাশক নির্দেশিত মাত্রায় স্প্রে করুন।',
       relevanceScore: 1.0
     },
@@ -61,7 +69,7 @@ export class OfflineRetriever {
       sourceId: 'bari-eggplant-borer',
       sourceTitle: 'BARI সবজি উৎপাদন প্রযুক্তি',
       crop: 'বেগুন',
-      topic: 'বেগুনের ডগা ও ফল ছিদ্রকারী পোকা',
+      topic: 'বেগুনের ডগা ও ফল ছিদ্রকারী পোকা (Eggplant / Brinjal Shoot and Fruit Borer)',
       passage: 'বেগুনের ডগা ও ফল ছিদ্রকারী পোকা দমনে আক্রান্ত ডগা কেটে ধ্বংস করুন ও সেক্স ফেরোমোন ফাঁদ ব্যবহার করুন। প্রয়োজনে স্পাইনোস্যাড বা এমামেক্টিন বেনজোয়েট স্প্রে করুন। বেগুন তোলার ৭-১০ দিন আগে কীটনাশক স্প্রে বন্ধ রাখুন।',
       relevanceScore: 1.0
     },
@@ -70,7 +78,7 @@ export class OfflineRetriever {
       sourceId: 'dae-flood-advisory',
       sourceTitle: 'DAE দুর্যোগ ব্যবস্থাপনা ও কৃষি পুনর্বাসন সেল',
       crop: 'ধান',
-      topic: 'আকস্মিক বন্যা ও পাহাড়ি ঢলে পাকা ধান কর্তন',
+      topic: 'আকস্মিক বন্যা ও পাহাড়ি ঢলে পাকা ধান কর্তন (Flash Flood Rice Harvesting)',
       passage: 'হাওর বা নিম্নাঞ্চলে পাহাড়ি ঢল বা আগাম বন্যার পূর্বাভাস থাকলে ধানের ৮০ ভাগ পেকে গেলেই দ্রুত কেটে ফেলতে হবে। সম্পূর্ণ পাকার অপেক্ষা করা যাবে না। কাটা ধান উঁচু স্থানে বা পাকা রাস্তায় ত্রিপল দিয়ে ঢেকে সংরক্ষণ করুন।',
       relevanceScore: 1.0
     },
@@ -79,7 +87,7 @@ export class OfflineRetriever {
       sourceId: 'bari-bacterial-wilt',
       sourceTitle: 'BARI উদ্ভিদ রোগতত্ত্ব বিভাগ',
       crop: 'টমেটো',
-      topic: 'টমেটোর ব্যাকটেরিয়াজনিত ঢলে পড়া রোগ (Bacterial Wilt)',
+      topic: 'টমেটোর ব্যাকটেরিয়াজনিত ঢলে পড়া রোগ (Bacterial Wilt of Tomato)',
       passage: 'টমেটোর ব্যাকটেরিয়াজনিত ঢলে পড়া রোগে কাণ্ড কাটলে পানিতে সাদা সুতার মতো ব্যাকটেরিয়াল উজ বের হয়। এতে ছত্রাকনাশকে কাজ হয় না। আক্রান্ত গাছ শিকড়সহ তুলে মাটিতে পুঁতে ফেলতে হবে এবং জমিতে চুন বা ব্লিচিং পাউডার দিয়ে শোধন করতে হবে।',
       relevanceScore: 1.0
     },
@@ -88,7 +96,7 @@ export class OfflineRetriever {
       sourceId: 'bari-wheat-blast',
       sourceTitle: 'BARI গম ও ভুট্টা গবেষণা ইনস্টিটিউট',
       crop: 'গম',
-      topic: 'গম ব্লাস্ট রোগ (Wheat Blast)',
+      topic: 'গম ব্লাস্ট রোগ (Wheat Blast Disease)',
       passage: 'গম ব্লাস্ট রোগে শিষের উপরের অংশ সাদা হয়ে শুকিয়ে যায় ও দানা চিটা হয়ে যায়। প্রতিরোধে ট্রাইফ্লক্সিস্ট্রবিন + টেবুকোনাজল (নেটিভো) বা অনুমোদিত ছত্রাকনাশক বিকেলে স্প্রে করতে হয়। পরবর্তী মৌসুমের জন্য ব্লাস্ট প্রতিরোধী বারি গম ৩৩ চাষের পরামর্শ দেওয়া হয়।',
       relevanceScore: 1.0
     },
@@ -97,7 +105,7 @@ export class OfflineRetriever {
       sourceId: 'brri-zinc-deficiency',
       sourceTitle: 'BRRI মৃত্তিকা বিজ্ঞান বিভাগ',
       crop: 'ধান',
-      topic: 'দস্তা (জিঙ্ক) ও সালফারের ঘাটতি (খাঁয়রা রোগ)',
+      topic: 'দস্তা (জিঙ্ক) ও সালফারের ঘাটতি খাঁয়রা রোগ (Zinc and Sulfur Deficiency / Khaira)',
       passage: 'ধানের কচি পাতার শিরাগুলোর মাঝে হলুদ হয়ে যাওয়া ও পাতায় মরচে রঙের ছোপ পড়া দস্তার ঘাটতির লক্ষণ। হেক্টর প্রতি জিংক সালফেট বা চিলেটেড জিংক (১ গ্রাম প্রতি লিটার পানি) স্প্রে করুন। কখনোই ফসফেট সারের সাথে জিংক মিশিয়ে প্রয়োগ করবেন না।',
       relevanceScore: 1.0
     }
@@ -109,6 +117,21 @@ export class OfflineRetriever {
     /^(সালাম|আসসালামু|নমস্কার|আদাব|হ্যালো|কেমন আছেন|ভাল আছেন)/i,
     /^(good morning|good afternoon|good evening)\b/i
   ];
+
+  private matchesCrop(chunkCrop: string, queryCrop: string): boolean {
+    const c1 = chunkCrop.trim().toLowerCase();
+    const c2 = queryCrop.trim().toLowerCase();
+    if (c1 === c2 || c1.includes(c2) || c2.includes(c1)) return true;
+
+    for (const [key, aliases] of Object.entries(CROP_ALIASES)) {
+      const aliasMatch1 = key === c1 || aliases.some(a => c1.includes(a));
+      const aliasMatch2 = key === c2 || aliases.some(a => c2.includes(a));
+      if (aliasMatch1 && aliasMatch2) {
+        return true;
+      }
+    }
+    return false;
+  }
 
   public async retrieveRelevantPassages(
     query: string,
@@ -141,22 +164,22 @@ export class OfflineRetriever {
       const lowerTopic = chunk.topic.toLowerCase();
       const lowerPassage = chunk.passage.toLowerCase();
       const lowerCrop = chunk.crop.toLowerCase();
+      const aliases = CROP_ALIASES[chunk.crop] || [];
 
       for (const token of queryTokens) {
         if (lowerTopic.includes(token)) {
           tokenScore += 4.0;
         } else if (lowerPassage.includes(token)) {
           tokenScore += 2.0;
+        } else if (aliases.some(a => a.toLowerCase() === token)) {
+          tokenScore += 2.5;
         }
       }
 
       // Only grant crop bonus IF the user query has at least one matching token or explicitly mentions the crop
       let totalScore = tokenScore;
       if (tokenScore > 0) {
-        if (
-          lowerCrop.includes(crop.toLowerCase()) ||
-          crop.toLowerCase().includes(lowerCrop)
-        ) {
+        if (this.matchesCrop(chunk.crop, crop)) {
           totalScore += 1.5;
         }
       }

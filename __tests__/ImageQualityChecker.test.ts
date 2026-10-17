@@ -30,4 +30,14 @@ describe('ImageQualityChecker', () => {
     expect(result.isTooBright).toBe(false);
     expect(result.warningMessageBn).toBeNull();
   });
+
+  it('should return English warning message when language is en', () => {
+    const darkResult = checker.evaluateImageQuality(20, 'en');
+    expect(darkResult.warningMessageEn).toContain('too dark');
+    expect(darkResult.warningMessage).toContain('too dark');
+
+    const brightResult = checker.evaluateImageQuality(245, 'en');
+    expect(brightResult.warningMessageEn).toContain('overexposed');
+    expect(brightResult.warningMessage).toContain('overexposed');
+  });
 });
