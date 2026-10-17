@@ -15,8 +15,12 @@ export class PinHasher {
     return computed === expectedHash;
   }
 
+  public static normalizePhone(phone: string): string {
+    return phone.replace(/[\s-+]/g, '').replace(/^88/, '');
+  }
+
   public static isValidPhone(phone: string): boolean {
-    const cleaned = phone.replace(/[\s-+]/g, '').replace(/^88/, '');
+    const cleaned = this.normalizePhone(phone);
     // BD standard format: 013, 014, 015, 016, 017, 018, 019 followed by 8 digits
     return /^(01[3-9]\d{8})$/.test(cleaned);
   }

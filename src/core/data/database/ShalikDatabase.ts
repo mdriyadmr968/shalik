@@ -345,9 +345,9 @@ export class ShalikDatabase {
   public userDao(): UserDao {
     return {
       getUserByPhone: async (phone: string): Promise<User | null> => {
-        const cleaned = phone.replace(/[\s-]/g, '');
+        const cleaned = PinHasher.normalizePhone(phone);
         for (const user of this.users.values()) {
-          if (user.phone.replace(/[\s-]/g, '') === cleaned) {
+          if (PinHasher.normalizePhone(user.phone) === cleaned) {
             return user;
           }
         }

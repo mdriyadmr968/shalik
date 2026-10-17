@@ -233,34 +233,10 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({ onLoginSuccess }) => {
               maxLength={4}
             />
 
-            <Text style={styles.label}>{t.roleLabel}</Text>
-            <View style={styles.roleChoiceContainer}>
-              <TouchableOpacity
-                style={[styles.roleChip, regRole === UserRole.FARMER && styles.roleChipActive]}
-                onPress={() => setRegRole(UserRole.FARMER)}
-              >
-                <Text style={[styles.roleChipText, regRole === UserRole.FARMER && styles.roleChipTextActive]}>
-                  {t.roleFarmer}
-                </Text>
-              </TouchableOpacity>
-
-              <TouchableOpacity
-                style={[styles.roleChip, regRole === UserRole.OFFICER && styles.roleChipActive]}
-                onPress={() => setRegRole(UserRole.OFFICER)}
-              >
-                <Text style={[styles.roleChipText, regRole === UserRole.OFFICER && styles.roleChipTextActive]}>
-                  {t.roleOfficer}
-                </Text>
-              </TouchableOpacity>
-
-              <TouchableOpacity
-                style={[styles.roleChip, regRole === UserRole.ADMIN && styles.roleChipActive]}
-                onPress={() => setRegRole(UserRole.ADMIN)}
-              >
-                <Text style={[styles.roleChipText, regRole === UserRole.ADMIN && styles.roleChipTextActive]}>
-                  {t.roleAdmin}
-                </Text>
-              </TouchableOpacity>
+            <View style={styles.farmerRoleNotice}>
+              <Text style={styles.farmerRoleNoticeText}>
+                🌾 {lang === 'en' ? 'Registration Role: Farmer' : 'নিবন্ধন ভূমিকা: কৃষক'}
+              </Text>
             </View>
 
             <Text style={styles.label}>{t.districtLabel}</Text>
@@ -474,6 +450,21 @@ const styles = StyleSheet.create({
   roleChipTextActive: {
     color: Colors.agriculturalGreen,
     fontWeight: 'bold'
+  },
+  farmerRoleNotice: {
+    backgroundColor: '#E8F5E9',
+    borderRadius: 8,
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+    borderWidth: 1,
+    borderColor: '#C8E6C9',
+    marginTop: 10,
+    marginBottom: 4
+  },
+  farmerRoleNoticeText: {
+    fontSize: 13,
+    fontWeight: 'bold',
+    color: Colors.agriculturalGreen
   },
   actionBtn: {
     backgroundColor: Colors.agriculturalGreen,

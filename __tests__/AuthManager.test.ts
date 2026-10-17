@@ -106,6 +106,23 @@ describe('Offline Authentication & RBAC Authorization Suite', () => {
       expect(loginRes.success).toBe(true);
     });
 
+    it('authenticates user with +88 country code prefix via normalization', async () => {
+      const result = await authManager.login('+8801711000001', '1234');
+      expect(result.success).toBe(true);
+      expect(result.user?.phone).toBe('01711000001');
+    });
+
+    it('safely restricts public self-registration to FARMER role even if ADMIN requested', async () => {
+      const result = await authManager.register({
+        phone: '01799887766',
+        pin: '1234',
+        name: 'চেষ্টাকারী',
+        role: UserRole.ADMIN
+      });
+      expect(result.success).toBe(true);
+      expect(result.user?.role).toBe(UserRole.FARMER);
+    });
+
     it('rejects registration with already registered phone number', async () => {
       const result = await authManager.register({
         phone: '01711000001', // Already seeded farmer

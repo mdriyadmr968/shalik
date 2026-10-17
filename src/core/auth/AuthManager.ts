@@ -27,7 +27,26 @@ export class AuthManager {
       if (typeof localStorage !== 'undefined') {
         const raw = localStorage.getItem(AuthManager.SESSION_STORAGE_KEY);
         if (raw) {
-          this.currentUser = JSON.parse(raw);
+          const parsed = JSON.parse(raw);
+          this.currentUser = {
+            id: parsed.id,
+            phone: PinHasher.normalizePhone(parsed.phone || ''),
+            name: parsed.name,
+            pinHash: '',
+            role: parsed.role || UserRole.FARMER,
+            district: parsed.district || '',
+            upazila: parsed.upazila || '',
+            createdAt: parsed.createdAt || Date.now()
+          };
+          // Asynchronously verify against authoritative database
+          this.db.userDao().getUserById(parsed.id).then(dbUser => {
+            if (!dbUser) {
+              this.logout();
+            } else if (this.currentUser && (this.currentUser.role !== dbUser.role || this.currentUser.name !== dbUser.name)) {
+              this.currentUser = dbUser;
+              this.notify();
+            }
+          }).catch(() => {});
         }
       }
     } catch (_) {}
@@ -37,7 +56,16 @@ export class AuthManager {
     try {
       if (typeof localStorage !== 'undefined') {
         if (user) {
-          localStorage.setItem(AuthManager.SESSION_STORAGE_KEY, JSON.stringify(user));
+          const sanitized = {
+            id: user.id,
+            phone: user.phone,
+            name: user.name,
+            role: user.role,
+            district: user.district,
+            upazila: user.upazila,
+            createdAt: user.createdAt
+          };
+          localStorage.setItem(AuthManager.SESSION_STORAGE_KEY, JSON.stringify(sanitized));
         } else {
           localStorage.removeItem(AuthManager.SESSION_STORAGE_KEY);
         }
@@ -79,7 +107,7 @@ export class AuthManager {
   }
 
   public async login(phone: string, pin: string): Promise<AuthResult> {
-    const cleanedPhone = phone.replace(/[\s-]/g, '');
+    const cleanedPhone = PinHasher.normalizePhone(phone);
     if (!PinHasher.isValidPhone(cleanedPhone)) {
       return {
         success: false,
@@ -123,7 +151,7 @@ export class AuthManager {
     district?: string;
     upazila?: string;
   }): Promise<AuthResult> {
-    const cleanedPhone = params.phone.replace(/[\s-]/g, '');
+    const cleanedPhone = PinHasher.normalizePhone(params.phone);
     if (!PinHasher.isValidPhone(cleanedPhone)) {
       return {
         success: false,
@@ -153,12 +181,19 @@ export class AuthManager {
       };
     }
 
+    // Public self-registration is strictly restricted to FARMER role.
+    // Elevated roles (OFFICER, ADMIN) are assigned by system admins or initialized in demo accounts.
+    const assignedRole =
+      params.role === UserRole.ADMIN || params.role === UserRole.OFFICER
+        ? UserRole.FARMER
+        : (params.role || UserRole.FARMER);
+
     const newUser: User = {
       id: `usr_${Date.now()}_${Math.floor(Math.random() * 1000)}`,
       phone: cleanedPhone,
       name: params.name.trim(),
       pinHash: PinHasher.hashPin(params.pin),
-      role: params.role || UserRole.FARMER,
+      role: assignedRole,
       district: params.district?.trim() || 'কুড়িগ্রাম',
       upazila: params.upazila?.trim() || 'চিলমারী',
       createdAt: Date.now()
