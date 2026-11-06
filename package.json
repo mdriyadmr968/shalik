@@ -11,6 +11,7 @@
     "build:web": "vite build",
     "test": "jest",
     "test:coverage": "jest --coverage",
+    "test:e2e": "node __tests__/e2e/test-full-e2e.mjs",
     "type-check": "tsc --noEmit"
   },
   "dependencies": {

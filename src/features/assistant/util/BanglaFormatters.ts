@@ -12,11 +12,32 @@ export class BanglaFormatters {
     '9': '৯'
   };
 
+  private static readonly banglaToEnglishDigits: Record<string, string> = {
+    '০': '0',
+    '১': '1',
+    '২': '2',
+    '৩': '3',
+    '৪': '4',
+    '৫': '5',
+    '৬': '6',
+    '৭': '7',
+    '৮': '8',
+    '৯': '9'
+  };
+
   public static toBanglaDigits(input: string | number): string {
     const str = String(input);
     return str
       .split('')
       .map(ch => BanglaFormatters.englishToBanglaDigits[ch] || ch)
+      .join('');
+  }
+
+  public static toEnglishDigits(input: string | number): string {
+    const str = String(input);
+    return str
+      .split('')
+      .map(ch => BanglaFormatters.banglaToEnglishDigits[ch] || ch)
       .join('');
   }
 

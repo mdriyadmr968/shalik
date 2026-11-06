@@ -361,6 +361,13 @@ export const AssistantScreen: React.FC<AssistantScreenProps> = ({ viewModel }) =
           value={inputText}
           onChangeText={setInputText}
           multiline
+          onKeyPress={(e: any) => {
+            if (e.nativeEvent?.key === 'Enter' && !e.nativeEvent?.shiftKey) {
+              if (e.preventDefault) e.preventDefault();
+              handleSend();
+            }
+          }}
+          onSubmitEditing={handleSend}
         />
 
         {uiState.isGenerating ? (
@@ -398,6 +405,13 @@ export const AssistantScreen: React.FC<AssistantScreenProps> = ({ viewModel }) =
               value={transcriptInput}
               onChangeText={setTranscriptInput}
               multiline
+          onKeyPress={(e: any) => {
+            if (e.nativeEvent?.key === 'Enter' && !e.nativeEvent?.shiftKey) {
+              if (e.preventDefault) e.preventDefault();
+              handleSend();
+            }
+          }}
+          onSubmitEditing={handleSend}
             />
             <Text style={styles.modalHint}>{t.voiceDialogHint}</Text>
             <View style={styles.modalButtonRow}>

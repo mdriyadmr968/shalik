@@ -1,3 +1,5 @@
+import { BanglaFormatters } from '../../../features/assistant/util/BanglaFormatters';
+
 /**
  * Pure TypeScript SHA-256 implementation to guarantee 100% offline security
  * across all environments (React Native, Web, and Node.js) without external native bindings.
@@ -6,7 +8,8 @@ export class PinHasher {
   private static readonly SALT = 'shalik_offline_salt_v1_';
 
   public static hashPin(pin: string): string {
-    const salted = `${this.SALT}${pin.trim()}`;
+    const normalized = BanglaFormatters.toEnglishDigits(pin.trim());
+    const salted = `${this.SALT}${normalized}`;
     return this.sha256(salted);
   }
 
@@ -16,7 +19,8 @@ export class PinHasher {
   }
 
   public static normalizePhone(phone: string): string {
-    return phone.replace(/[\s-+]/g, '').replace(/^88/, '');
+    const normalizedDigits = BanglaFormatters.toEnglishDigits(phone);
+    return normalizedDigits.replace(/[\s-+]/g, '').replace(/^88/, '');
   }
 
   public static isValidPhone(phone: string): boolean {
@@ -26,7 +30,8 @@ export class PinHasher {
   }
 
   public static isValidPin(pin: string): boolean {
-    return /^\d{4}$/.test(pin.trim());
+    const normalized = BanglaFormatters.toEnglishDigits(pin.trim());
+    return /^\d{4}$/.test(normalized);
   }
 
   public static sha256(ascii: string): string {

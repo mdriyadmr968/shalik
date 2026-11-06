@@ -253,8 +253,11 @@ export class AssistantViewModel {
     const trimmed = userText.trim();
     if (!trimmed || this.state.isGenerating) return;
 
-    const convId = this.state.currentConversationId;
-    if (!convId) return;
+    let convId = this.state.currentConversationId;
+    if (!convId) {
+      convId = await this.chatRepository.createConversation('নতুন পরামর্শ');
+      this.setState({ currentConversationId: convId });
+    }
 
     const attachedImg = this.state.attachedImageUri;
     const profile = await this.profileRepository.getFarmerProfile();

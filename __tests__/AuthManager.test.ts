@@ -28,11 +28,13 @@ describe('Offline Authentication & RBAC Authorization Suite', () => {
       expect(PinHasher.verifyPin('1234', hash)).toBe(false);
     });
 
-    it('validates 11-digit Bangladeshi phone numbers accurately', () => {
+    it('validates 11-digit Bangladeshi phone numbers accurately including Bengali numerals', () => {
       expect(PinHasher.isValidPhone('01711000001')).toBe(true);
       expect(PinHasher.isValidPhone('01811000002')).toBe(true);
       expect(PinHasher.isValidPhone('01911000003')).toBe(true);
       expect(PinHasher.isValidPhone('01300000000')).toBe(true);
+      expect(PinHasher.isValidPhone('০১৭১১০০০০০১')).toBe(true);
+      expect(PinHasher.isValidPhone('+88০১৭১১০০০০০১')).toBe(true);
 
       // Invalid
       expect(PinHasher.isValidPhone('01211000001')).toBe(false); // 012 is not standard BD operator
@@ -43,6 +45,7 @@ describe('Offline Authentication & RBAC Authorization Suite', () => {
     it('validates 4-digit PIN format', () => {
       expect(PinHasher.isValidPin('1234')).toBe(true);
       expect(PinHasher.isValidPin('0000')).toBe(true);
+      expect(PinHasher.isValidPin('১২৩৪')).toBe(true);
       expect(PinHasher.isValidPin('123')).toBe(false);
       expect(PinHasher.isValidPin('12345')).toBe(false);
       expect(PinHasher.isValidPin('abcd')).toBe(false);
@@ -57,6 +60,14 @@ describe('Offline Authentication & RBAC Authorization Suite', () => {
       expect(result.user?.role).toBe(UserRole.FARMER);
       expect(authManager.isAuthenticated()).toBe(true);
       expect(authManager.getCurrentUser()?.phone).toBe('01711000001');
+    });
+
+    it('authenticates seeded farmer account using Bengali numerals', async () => {
+      const result = await authManager.login('০১৭১১০০০০০১', '১২৩৪');
+      expect(result.success).toBe(true);
+      expect(result.user).toBeDefined();
+      expect(result.user?.role).toBe(UserRole.FARMER);
+      expect(authManager.isAuthenticated()).toBe(true);
     });
 
     it('authenticates seeded SAAO Officer account successfully', async () => {
